@@ -1,0 +1,159 @@
+# ------------------------------------------------------------------
+# MCK Church App — local dev environment, self-contained (own postgres,
+# redis, pgadmin — not reusing icmfs's containers).
+#
+# Port choices below deliberately avoid colliding with your icmfs stack
+# (icmfs: postgres 5432, redis 6379, pgadmin 90) so both can run at the
+# same time if you ever need to:
+#
+#   Service    Host port   Container port
+#   backend      8000         8000
+#   admin        5173         5173
+#   postgres     5433         5432
+#   redis        6380         6379
+#   pgadmin        91           80
+#   mailhog    8025/1025    8025/1025
+# ------------------------------------------------------------------
+
+services:
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: mck_backend
+    restart: unless-stopped
+    command: python manage.py runserver 0.0.0.0:8000
+    volumes:
+      - ./backend:/app
+      - media_data:/app/media
+      - static_data:/app/staticfiles
+    ports:
+      - "8000:8000"
+    env_file:
+      - ./backend/.env
+    depends_on:
+      - postgres
+      - redis
+    networks:
+      - mck_network
+
+  celery_worker:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: mck_celery_worker
+    restart: unless-stopped
+    command: celery -A config worker -l info
+    volumes:
+      - ./backend:/app
+      - media_data:/app/media
+    env_file:
+      - ./backend/.env
+    depends_on:
+      - postgres
+      - redis
+    networks:
+      - mck_network
+
+  celery_beat:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: mck_celery_beat
+    restart: unless-stopped
+    # scheduled jobs: next-service reminders, weekly JCTM age-out check
+    # (flags GroupGraduation candidates)
+    command: celery -A config beat -l info
+    volumes:
+      - ./backend:/app
+    env_file:
+      - ./backend/.env
+    depends_on:
+      - postgres
+      - redis
+    networks:
+      - mck_network
+
+  admin:
+    build:
+      context: ./admin-panel
+      dockerfile: Dockerfile
+    container_name: mck_admin
+    restart: unless-stopped
+    command: npm run dev -- --host
+    volumes:
+      - ./admin-panel:/app
+      - /app/node_modules
+    ports:
+      - "5173:5173"
+    environment:
+      - VITE_API_BASE_URL=http://localhost:8000/api
+      - CHOKIDAR_USEPOLLING=true
+    depends_on:
+      - backend
+    networks:
+      - mck_network
+
+  postgres:
+    image: postgres:16
+    container_name: mck_postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: mck_church
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: CHANGE_ME_DEV_DB_PASSWORD
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5433:5432"
+    networks:
+      - mck_network
+
+  redis:
+    image: redis:7-alpine
+    container_name: mck_redis
+    restart: unless-stopped
+    ports:
+      - "6380:6379"
+    networks:
+      - mck_network
+
+  pgadmin:
+    image: dpage/pgadmin4:latest
+    container_name: mck_pgadmin
+    restart: unless-stopped
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@mck.church
+      PGADMIN_DEFAULT_PASSWORD: admin123
+    ports:
+      - "91:80"
+    depends_on:
+      - postgres
+    networks:
+      - mck_network
+
+  mailhog:
+    image: mailhog/mailhog
+    container_name: mck_mailhog
+    restart: unless-stopped
+    ports:
+      - "8025:8025"   # web UI — view outgoing dev emails
+      - "1025:1025"   # SMTP
+    networks:
+      - mck_network
+
+networks:
+  mck_network:
+    driver: bridge
+
+volumes:
+  postgres_data:
+  media_data:
+  static_data:
+
+# ------------------------------------------------------------------
+# NOT containerized (by design):
+# - Flutter app: run with `flutter run` locally, point API_BASE_URL
+#   at http://localhost:8000 (Android emulator: http://10.0.2.2:8000)
+# ------------------------------------------------------------------

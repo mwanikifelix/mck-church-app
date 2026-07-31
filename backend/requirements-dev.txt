@@ -1,0 +1,22 @@
+# pip install -r requirements.txt -r requirements-dev.txt
+# Kept separate from requirements.txt so the production/container image
+# doesn't carry test/lint tooling it never needs.
+
+-r requirements.txt
+
+# --- testing ---
+pytest>=8.2
+pytest-django>=4.8
+factory-boy>=3.3          # build test User/Group/Event fixtures without
+                           # hand-writing every field (RBAC + eligibility
+                           # rules make manual fixtures tedious)
+coverage>=7.5
+
+# --- linting / formatting ---
+ruff>=0.5                 # fast lint + import sort, replaces flake8+isort
+black>=24.4
+
+# --- dev conveniences ---
+django-extensions>=3.2    # shell_plus, graph_models — useful for exploring
+                           # the Group/GroupGraduation relationships interactively
+django-debug-toolbar>=4.4

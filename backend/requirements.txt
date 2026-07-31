@@ -1,0 +1,39 @@
+# --- core framework (from your guide) ---
+Django>=5.0
+djangorestframework
+django-filter
+
+# --- auth (from your guide, plus what MCK needs on top) ---
+djangorestframework-simplejwt
+social-auth-app-django>=5.4   # Google OAuth (sign up / sign in with Google)
+google-auth>=2.29             # verifies Google ID tokens server-side for /google/
+django-cors-headers
+
+# --- database ---
+psycopg2-binary
+
+# --- media / files (MCK-specific: passport photos, event banners) ---
+Pillow>=10.3
+qrcode[pil]>=7.4               # QR code on the digital membership card
+django-storages>=1.14         # local now, swap to S3/GCS later without code changes
+
+# --- background jobs (from your guide) ---
+celery
+redis
+django-redis                  # cache backend, points at the same redis-stack container
+django-celery-beat            # scheduled jobs: next-service reminders, weekly
+                               # JCTM age-out check that flags GroupGraduation candidates
+
+# --- integrations (MCK-specific) ---
+requests                      # M-Pesa Daraja API calls
+firebase-admin>=6.5           # FCM push notifications
+
+# --- API documentation (from your guide) ---
+drf-spectacular==0.27.2
+
+# --- static files (no nginx in front yet) ---
+whitenoise>=6.6
+
+# --- config / server ---
+python-dotenv>=1.0.0
+gunicorn>=22.0
