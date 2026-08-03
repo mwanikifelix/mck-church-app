@@ -20,7 +20,17 @@ PERMISSIONS = [
     ("livestream.manage", "Manage livestream schedule and status"),
     ("counseling.view", "View counseling/guidance bookings"),
     ("leadership.manage", "Edit church leadership carousel entries"),
+    ("events.manage", "Create/edit the church events calendar"),
+    ("prayer.manage", "View and manage confidential prayer requests"),
+    ("notifications.broadcast", "Send church-wide broadcast notifications"),
+    ("membership.manage_status", "Change member status and edit church profile/contacts"),
+    ("pastoral.view_all", "View all counselling requests (not just own)"),
 ]
+
+CLERGY_ROLE_NAMES = {
+    "Superintendent Minister", "Pastor", "Youth Pastor / Youth Reverend",
+    "Bishop", "Preacher", "Evangelist",
+}
 
 # name -> (is_admin, can_act_as_superintendent, [permission codes])
 ROLES = {
@@ -34,7 +44,20 @@ ROLES = {
     ),
     "Pastor": (
         True, True,  # can_act_as_superintendent
-        ["member.default", "reports.view", "content.manage", "counseling.view"],
+        ["member.default", "reports.view", "content.manage", "counseling.view",
+         "prayer.manage", "pastoral.view_all"],
+    ),
+    "Bishop": (
+        True, False,
+        ["member.default"],
+    ),
+    "Preacher": (
+        True, False,
+        ["member.default"],
+    ),
+    "Evangelist": (
+        True, False,
+        ["member.default"],
     ),
     "Youth Pastor / Youth Reverend": (
         True, False,
@@ -62,7 +85,8 @@ ROLES = {
     ),
     "Secretary": (
         True, False,
-        ["member.default", "members.view_all", "content.manage", "leadership.manage"],
+        ["member.default", "members.view_all", "content.manage", "leadership.manage",
+         "events.manage", "notifications.broadcast", "membership.manage_status"],
     ),
 
     # Documented "Admin": full access to everything. Deliberately a
@@ -94,6 +118,7 @@ class Command(BaseCommand):
                 defaults={
                     "is_admin": is_admin,
                     "can_act_as_superintendent": can_act_as_superintendent,
+                    "is_clergy": name in CLERGY_ROLE_NAMES,
                 },
             )
             role.permissions.set([perm_objs[c] for c in codes])

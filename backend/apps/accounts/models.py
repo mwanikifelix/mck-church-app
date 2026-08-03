@@ -57,6 +57,11 @@ class Role(models.Model):
         help_text="Pastor role: steps in as acting Superintendent when the "
                    "Superintendent Minister is on leave.",
     )
+    is_clergy = models.BooleanField(
+        default=False,
+        help_text="Included in the clergy directory (Superintendent, Pastor, "
+                   "Bishop, Preacher, Evangelist, etc.).",
+    )
     permissions = models.ManyToManyField(Permission, blank=True, related_name="roles")
     created_at = models.DateTimeField(auto_now_add=True)
 
@@ -103,6 +108,18 @@ class MaritalStatus(models.TextChoices):
     DIVORCED = "divorced", "Divorced"
 
 
+class MembershipStatus(models.TextChoices):
+    ACTIVE = "active", "Active"
+    INACTIVE = "inactive", "Inactive"
+    TRANSFERRED = "transferred", "Transferred"
+
+
+class MembershipStatus(models.TextChoices):
+    ACTIVE = "active", "Active"
+    INACTIVE = "inactive", "Inactive"
+    TRANSFERRED = "transferred", "Transferred"
+
+
 class User(AbstractUser):
     username = None  # email is the login field, no separate username
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
@@ -123,6 +140,13 @@ class User(AbstractUser):
     marital_status = models.CharField(
         max_length=10, choices=MaritalStatus.choices, null=True, blank=True,
         help_text="Required for group eligibility checks, e.g. Youth = single only.",
+    )
+    status = models.CharField(
+        max_length=15, choices=MembershipStatus.choices, default=MembershipStatus.ACTIVE,
+        help_text="Current status; full change history in membership.MembershipStatusChange.",
+    )
+    bio = models.TextField(
+        blank=True, help_text="Short bio, shown on the clergy directory if applicable."
     )
 
     google_sub = models.CharField(

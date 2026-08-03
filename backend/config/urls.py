@@ -17,11 +17,16 @@ urlpatterns = [
     path("api/giving/", include("apps.giving.urls")),
     # path("api/events/", include("apps.events.urls")),
     # path("api/membership/", include("apps.membership.urls")),
+    path("api/pastoral/", include("apps.pastoral.urls")),
     path("api/giving/", include("apps.giving.urls")),
     # path("api/pastoral/", include("apps.pastoral.urls")),
     path("api/content/", include("apps.content.urls")),
+    path("api/prayer/", include("apps.prayer.urls")),
+    path("api/events/", include("apps.events.urls")),
     # path("api/chatbot/", include("apps.chatbot.urls")),
-    # path("api/notifications/", include("apps.notifications.urls")),
+    path("api/notifications/", include("apps.notifications.urls")),
+    path("api/membership/", include("apps.membership.urls")),
+    path("api/pastoral/", include("apps.pastoral.urls")),
 ]
 
 if settings.DEBUG:
