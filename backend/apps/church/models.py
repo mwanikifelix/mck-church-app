@@ -27,6 +27,8 @@ class Department(models.Model):
         null=True, blank=True, related_name="departments_secretary_of",
         help_text="Can edit this department's About section.",
     )
+    meeting_day = models.CharField(max_length=20, blank=True)
+    meeting_time = models.CharField(max_length=20, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:

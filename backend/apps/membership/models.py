@@ -33,6 +33,11 @@ class ChurchProfile(models.Model):
     card. Only one row should ever exist."""
 
     name = models.CharField(max_length=150, default="MCK Wesley Church")
+    logo = models.ImageField(upload_to="church_profile/", null=True, blank=True)
+    tagline = models.CharField(max_length=255, blank=True)
+    theme_title = models.CharField(max_length=200, blank=True)
+    theme_scripture_text = models.TextField(blank=True)
+    theme_scripture_reference = models.CharField(max_length=50, blank=True)
     motto = models.CharField(max_length=255, blank=True)
     vision = models.TextField(blank=True)
     mission = models.TextField(blank=True)

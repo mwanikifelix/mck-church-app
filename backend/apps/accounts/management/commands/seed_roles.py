@@ -25,6 +25,8 @@ PERMISSIONS = [
     ("notifications.broadcast", "Send church-wide broadcast notifications"),
     ("membership.manage_status", "Change member status and edit church profile/contacts"),
     ("pastoral.view_all", "View all counselling requests (not just own)"),
+    ("chat.message_all", "Message any member regardless of shared group"),
+    ("registration.manage", "Open/close registration windows (Catechism and others)"),
 ]
 
 CLERGY_ROLE_NAMES = {
@@ -40,12 +42,12 @@ ROLES = {
     # view-only. This is intentionally different from "System Admin" below.
     "Superintendent Minister": (
         True, False,
-        ["member.default", "reports.view", "content.manage"],
+        ["member.default", "reports.view", "content.manage", "chat.message_all"],
     ),
     "Pastor": (
         True, True,  # can_act_as_superintendent
         ["member.default", "reports.view", "content.manage", "counseling.view",
-         "prayer.manage", "pastoral.view_all"],
+         "prayer.manage", "pastoral.view_all", "chat.message_all"],
     ),
     "Bishop": (
         True, False,
@@ -86,7 +88,8 @@ ROLES = {
     "Secretary": (
         True, False,
         ["member.default", "members.view_all", "content.manage", "leadership.manage",
-         "events.manage", "notifications.broadcast", "membership.manage_status"],
+         "events.manage", "notifications.broadcast", "membership.manage_status",
+         "registration.manage"],
     ),
 
     # Documented "Admin": full access to everything. Deliberately a

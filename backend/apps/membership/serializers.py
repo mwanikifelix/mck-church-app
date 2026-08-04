@@ -10,7 +10,10 @@ from .models import ChurchContact, ChurchProfile, MembershipStatusChange
 class ChurchProfileSerializer(serializers.ModelSerializer):
     class Meta:
         model = ChurchProfile
-        fields = ["name", "motto", "vision", "mission", "email", "location"]
+        fields = [
+            "name", "logo", "tagline", "theme_title", "theme_scripture_text",
+            "theme_scripture_reference", "motto", "vision", "mission", "email", "location",
+        ]
 
 
 class ChurchContactSerializer(serializers.ModelSerializer):

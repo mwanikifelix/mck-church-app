@@ -41,18 +41,18 @@ INSTALLED_APPS = [
     "apps.church",
     "apps.groups",
     "apps.hbc",
-    # "apps.events",
-    # "apps.membership",
     "apps.pastoral",
+    "apps.chatbot",
+    "apps.scripture",
+    "apps.about",
+    "apps.registration",
     "apps.giving",
-    # "apps.pastoral",
     "apps.content",
     "apps.prayer",
     "apps.events",
-    # "apps.chatbot",
     "apps.notifications",
     "apps.membership",
-    "apps.pastoral",
+
 ]
 
 MIDDLEWARE = [

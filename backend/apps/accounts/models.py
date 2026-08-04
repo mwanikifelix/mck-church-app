@@ -11,6 +11,10 @@ class Branch(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     name = models.CharField(max_length=120)
     address = models.CharField(max_length=255, blank=True)
+    short_description = models.CharField(
+        max_length=255, blank=True,
+        help_text="e.g. 'Located near Samburu Primary School' — shown on the circuit/branches list.",
+    )
     latitude = models.FloatField(null=True, blank=True)
     longitude = models.FloatField(null=True, blank=True)
     attendance_radius_meters = models.PositiveIntegerField(

@@ -10,7 +10,7 @@ class DepartmentSerializer(serializers.ModelSerializer):
         model = Department
         fields = [
             "id", "name", "description", "photo",
-            "branch", "leader", "leader_name", "created_at",
+            "branch", "leader", "leader_name", "meeting_day", "meeting_time", "created_at",
         ]
 
 

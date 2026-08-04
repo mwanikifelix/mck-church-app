@@ -5,14 +5,23 @@ from django.conf import settings
 from django.http import HttpResponse
 from google.auth.transport import requests as google_requests
 from google.oauth2 import id_token as google_id_token
-from rest_framework import generics, status
+from rest_framework import generics, permissions, status
 from rest_framework.permissions import IsAuthenticated
+
+from .permissions import HasPermissionCode
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework_simplejwt.tokens import RefreshToken
 
 from .models import User
-from .serializers import GoogleLoginSerializer, SignupSerializer, UserSerializer
+from .models import Permission, Role
+from .serializers import (
+    GoogleLoginSerializer,
+    PermissionSerializer,
+    RoleSerializer,
+    SignupSerializer,
+    UserSerializer,
+)
 
 
 def _tokens_for(user):
@@ -45,6 +54,57 @@ class MeView(generics.RetrieveUpdateAPIView):
 
     def get_object(self):
         return self.request.user
+
+
+class MemberListView(generics.ListAPIView):
+    """GET /api/accounts/members/ — full member directory, gated by
+    members.view_all (Secretary/Admin) or superuser."""
+
+    queryset = User.objects.select_related("branch", "role").order_by("full_name")
+    serializer_class = UserSerializer
+    permission_classes = [IsAuthenticated, HasPermissionCode("members.view_all")]
+    filterset_fields = ["branch", "role", "status"]
+    search_fields = ["full_name", "email", "membership_number"]
+
+
+class IsSuperuserOnly(permissions.BasePermission):
+    def has_permission(self, request, view):
+        if request.method in permissions.SAFE_METHODS:
+            return bool(request.user and request.user.is_authenticated)
+        return bool(request.user and request.user.is_superuser)
+
+
+class RoleListView(generics.ListAPIView):
+    queryset = Role.objects.prefetch_related("permissions")
+    serializer_class = RoleSerializer
+    permission_classes = [IsAuthenticated]
+
+
+class RoleDetailView(generics.RetrieveAPIView):
+    queryset = Role.objects.prefetch_related("permissions")
+    serializer_class = RoleSerializer
+    permission_classes = [IsAuthenticated]
+
+
+class RoleSetPermissionsView(APIView):
+    """PATCH /api/accounts/roles/<id>/permissions/ — { "codes": ["a.b", "c.d"] }"""
+
+    permission_classes = [IsSuperuserOnly]
+
+    def patch(self, request, pk):
+        role = Role.objects.filter(pk=pk).first()
+        if not role:
+            return Response({"detail": "Role not found."}, status=404)
+        codes = request.data.get("codes", [])
+        perms = Permission.objects.filter(code__in=codes)
+        role.permissions.set(perms)
+        return Response(RoleSerializer(role).data)
+
+
+class PermissionListView(generics.ListAPIView):
+    queryset = Permission.objects.all()
+    serializer_class = PermissionSerializer
+    permission_classes = [IsAuthenticated]
 
 
 class GoogleLoginView(APIView):

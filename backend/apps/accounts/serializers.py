@@ -1,13 +1,19 @@
 from django.contrib.auth.password_validation import validate_password
 from rest_framework import serializers
 
-from .models import Branch, Role, User
+from .models import Branch, Permission, Role, User
 
 
 class BranchSerializer(serializers.ModelSerializer):
     class Meta:
         model = Branch
         fields = ["id", "name", "address", "latitude", "longitude", "attendance_radius_meters"]
+
+
+class PermissionSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Permission
+        fields = ["id", "code", "description"]
 
 
 class RoleSerializer(serializers.ModelSerializer):
@@ -58,7 +64,7 @@ class UserSerializer(serializers.ModelSerializer):
         fields = [
             "id", "email", "full_name", "passport_photo", "membership_number",
             "branch", "branch_id", "role", "date_of_birth", "marital_status",
-            "age", "visible_folders", "date_joined",
+            "status", "age", "visible_folders", "date_joined",
         ]
         read_only_fields = ["id", "email", "membership_number", "role", "date_joined"]
 
