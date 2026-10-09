@@ -2,6 +2,7 @@ from django.urls import path
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 
 from .views import (
+    BranchListView,
     GoogleLoginView,
     MeView,
     MemberListView,
@@ -27,4 +28,5 @@ urlpatterns = [
     path("roles/<uuid:pk>/", RoleDetailView.as_view(), name="role-detail"),
     path("roles/<uuid:pk>/permissions/", RoleSetPermissionsView.as_view(), name="role-set-permissions"),
     path("permissions/", PermissionListView.as_view(), name="permission-list"),
+    path("branches/", BranchListView.as_view(), name="branch-list"),
 ]

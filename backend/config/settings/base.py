@@ -46,6 +46,7 @@ INSTALLED_APPS = [
     "apps.scripture",
     "apps.about",
     "apps.registration",
+    "apps.attendance",
     "apps.giving",
     "apps.content",
     "apps.prayer",

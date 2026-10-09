@@ -1,20 +1,23 @@
 <template>
-  <div style="max-width:360px; margin:4rem auto; font-family:sans-serif;">
-    <h2>MCK Admin Login</h2>
-    <form @submit.prevent="handleLogin">
-      <div style="margin-bottom:1rem;">
-        <label>Email</label>
-        <input v-model="email" type="email" required style="width:100%; padding:0.5rem;" />
-      </div>
-      <div style="margin-bottom:1rem;">
-        <label>Password</label>
-        <input v-model="password" type="password" required style="width:100%; padding:0.5rem;" />
-      </div>
-      <p v-if="error" style="color:red;">{{ error }}</p>
-      <button type="submit" :disabled="loading" style="width:100%; padding:0.6rem;">
-        {{ loading ? "Logging in..." : "Log In" }}
-      </button>
-    </form>
+  <div class="login-page">
+    <Card class="login-card">
+      <template #title>MCK Wesley Admin</template>
+      <template #subtitle>Sign in to manage the church system</template>
+      <template #content>
+        <form @submit.prevent="handleLogin" class="login-form">
+          <div class="field">
+            <label>Email</label>
+            <InputText v-model="email" type="email" required class="w-full" />
+          </div>
+          <div class="field">
+            <label>Password</label>
+            <Password v-model="password" :feedback="false" toggleMask required class="w-full" inputClass="w-full" />
+          </div>
+          <Message v-if="error" severity="error" :closable="false">{{ error }}</Message>
+          <Button type="submit" label="Log In" :loading="loading" class="w-full" />
+        </form>
+      </template>
+    </Card>
   </div>
 </template>
 
@@ -22,6 +25,11 @@
 import { ref } from "vue";
 import { useRouter } from "vue-router";
 import { useAuthStore } from "../store/auth";
+import Card from "primevue/card";
+import InputText from "primevue/inputtext";
+import Password from "primevue/password";
+import Button from "primevue/button";
+import Message from "primevue/message";
 
 const email = ref("");
 const password = ref("");
@@ -43,3 +51,30 @@ async function handleLogin() {
   }
 }
 </script>
+
+<style scoped>
+.login-page {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #f4f6f9;
+}
+.login-card {
+  width: 380px;
+}
+.login-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+.field label {
+  display: block;
+  margin-bottom: 0.35rem;
+  font-size: 0.85rem;
+  color: #475569;
+}
+.w-full {
+  width: 100%;
+}
+</style>

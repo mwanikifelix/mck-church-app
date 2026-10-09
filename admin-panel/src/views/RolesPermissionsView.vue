@@ -1,76 +1,46 @@
 <template>
-  <NavBar />
-  <div style="padding:2rem; font-family:sans-serif;">
-    <h1>Roles & Permissions</h1>
-    <p v-if="store.loading">Loading...</p>
-    <p v-if="saveError" style="color:red;">{{ saveError }}</p>
-
-    <div v-if="!store.loading" style="overflow-x:auto;">
-      <table border="1" cellpadding="6" style="border-collapse:collapse; white-space:nowrap;">
-        <thead>
-          <tr>
-            <th style="position:sticky; left:0; background:#fff; text-align:left;">Role</th>
-            <th
-              v-for="perm in store.permissions"
-              :key="perm.id"
-              :title="perm.description"
-              style="writing-mode:vertical-rl; text-orientation:mixed; font-weight:normal; font-size:0.8rem;"
-            >
-              {{ perm.code }}
-            </th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr v-for="role in store.roles" :key="role.id">
-            <td style="position:sticky; left:0; background:#fff; font-weight:bold;">
-              {{ role.name }}
-              <span v-if="savingRoleId === role.id" style="font-weight:normal; color:#888;"> (saving...)</span>
-            </td>
-            <td v-for="perm in store.permissions" :key="perm.id" style="text-align:center;">
-              <input
-                type="checkbox"
-                :checked="role.permissions.includes(perm.code)"
-                :disabled="savingRoleId === role.id"
-                @change="togglePermission(role, perm.code, $event.target.checked)"
-              />
-            </td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-  </div>
+  <DataTable :value="store.roles" :loading="store.loading" scrollable scrollHeight="70vh">
+    <Column field="name" header="Role" frozen style="font-weight:600; min-width:180px;" />
+    <Column v-for="perm in store.permissions" :key="perm.id" :header="perm.code" style="min-width:60px; text-align:center;">
+      <template #body="{ data }">
+        <Checkbox
+          :modelValue="data.permissions.includes(perm.code)"
+          binary
+          :disabled="savingRoleId === data.id"
+          @update:modelValue="(checked) => togglePermission(data, perm.code, checked)"
+        />
+      </template>
+    </Column>
+  </DataTable>
 </template>
 
 <script setup>
 import { ref, onMounted } from "vue";
-import NavBar from "../components/NavBar.vue";
+import DataTable from "primevue/datatable";
+import Column from "primevue/column";
+import Checkbox from "primevue/checkbox";
+import { useToast } from "primevue/usetoast";
 import { useRolesStore } from "../store/roles";
 import rolesService from "../services/roles.service";
 
 const store = useRolesStore();
+const toast = useToast();
 const savingRoleId = ref(null);
-const saveError = ref("");
 
 onMounted(() => store.fetchAll());
 
 async function togglePermission(role, code, checked) {
-  const currentCodes = role.permissions;
-  const newCodes = checked
-    ? [...currentCodes, code]
-    : currentCodes.filter((c) => c !== code);
-
-  // Optimistic update
   const previous = role.permissions;
+  const newCodes = checked ? [...previous, code] : previous.filter((c) => c !== code);
   role.permissions = newCodes;
 
   savingRoleId.value = role.id;
-  saveError.value = "";
   try {
     const { data } = await rolesService.setPermissions(role.id, newCodes);
     role.permissions = data.permissions;
   } catch (e) {
-    role.permissions = previous; // revert on failure
-    saveError.value = e.response?.data?.detail || `Failed to update ${role.name}.`;
+    role.permissions = previous;
+    toast.add({ severity: "error", summary: `Failed to update ${role.name}`, life: 3000 });
   } finally {
     savingRoleId.value = null;
   }

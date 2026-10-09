@@ -14,8 +14,9 @@ from rest_framework.views import APIView
 from rest_framework_simplejwt.tokens import RefreshToken
 
 from .models import User
-from .models import Permission, Role
+from .models import Branch, Permission, Role
 from .serializers import (
+    BranchSerializer,
     GoogleLoginSerializer,
     PermissionSerializer,
     RoleSerializer,
@@ -104,6 +105,12 @@ class RoleSetPermissionsView(APIView):
 class PermissionListView(generics.ListAPIView):
     queryset = Permission.objects.all()
     serializer_class = PermissionSerializer
+    permission_classes = [IsAuthenticated]
+
+
+class BranchListView(generics.ListCreateAPIView):
+    queryset = Branch.objects.all()
+    serializer_class = BranchSerializer
     permission_classes = [IsAuthenticated]
 
 

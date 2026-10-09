@@ -20,7 +20,6 @@ urlpatterns = [
     path("api/events/", include("apps.events.urls")),
     path("api/scripture/", include("apps.scripture.urls")),
     path("api/about/", include("apps.about.urls")),
-    path("api/registration/", include("apps.registration.urls")),
     path("api/notifications/", include("apps.notifications.urls")),
     path("api/membership/", include("apps.membership.urls")),
     path("api/pastoral/", include("apps.pastoral.urls")),

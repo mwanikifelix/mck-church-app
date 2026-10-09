@@ -1,27 +1,18 @@
 <template>
-  <NavBar />
-  <div style="padding:2rem; font-family:sans-serif;">
-    <h1>Giving Review</h1>
-    <p v-if="loading">Loading...</p>
-    <table v-else border="1" cellpadding="8" style="width:100%; border-collapse:collapse;">
-      <thead>
-        <tr><th>Member</th><th>Account</th><th>Amount</th><th>Date</th></tr>
-      </thead>
-      <tbody>
-        <tr v-for="d in donations" :key="d.id">
-          <td>{{ d.member_name }}</td>
-          <td>{{ d.account_code_display }}</td>
-          <td>{{ d.amount }}</td>
-          <td>{{ new Date(d.created_at).toLocaleDateString() }}</td>
-        </tr>
-      </tbody>
-    </table>
-  </div>
+  <DataTable :value="donations" :loading="loading" paginator :rows="15" sortMode="multiple">
+    <Column field="member_name" header="Member" sortable />
+    <Column field="account_code_display" header="Account" sortable />
+    <Column field="amount" header="Amount" sortable />
+    <Column header="Date" sortable sortField="created_at">
+      <template #body="{ data }">{{ new Date(data.created_at).toLocaleDateString() }}</template>
+    </Column>
+  </DataTable>
 </template>
 
 <script setup>
 import { ref, onMounted } from "vue";
-import NavBar from "../components/NavBar.vue";
+import DataTable from "primevue/datatable";
+import Column from "primevue/column";
 import givingService from "../services/giving.service";
 
 const donations = ref([]);
