@@ -1,0 +1,65 @@
+services:
+  backend:
+    build: ./backend
+    command: gunicorn config.wsgi:application --bind 0.0.0.0:8000 --workers 3
+    restart: unless-stopped
+    env_file: ./backend/.env.prod
+    volumes:
+      - media_data:/app/media
+      - static_data:/app/staticfiles
+    depends_on: [postgres, redis]
+    ports:
+      - "127.0.0.1:8000:8000"
+    networks: [mck_network]
+
+  celery_worker:
+    build: ./backend
+    command: celery -A config worker -l info
+    restart: unless-stopped
+    env_file: ./backend/.env.prod
+    volumes:
+      - media_data:/app/media
+    depends_on: [postgres, redis]
+    networks: [mck_network]
+
+  celery_beat:
+    build: ./backend
+    command: celery -A config beat -l info
+    restart: unless-stopped
+    env_file: ./backend/.env.prod
+    depends_on: [postgres, redis]
+    networks: [mck_network]
+
+  admin:
+    build:
+      context: ./admin-panel
+      args:
+        VITE_API_BASE_URL: https://app.artcleffenterprise.co.ke/api
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:8080:80"
+    networks: [mck_network]
+
+  postgres:
+    image: postgres:16
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: mck_church
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks: [mck_network]
+
+  redis:
+    image: redis:7-alpine
+    restart: unless-stopped
+    networks: [mck_network]
+
+networks:
+  mck_network:
+
+volumes:
+  postgres_data:
+  media_data:
+  static_data:
