@@ -6,7 +6,12 @@
       :subtitle="`${members.length} registered ${members.length === 1 ? 'member' : 'members'}`"
     >
       <template #extra>
-        <button type="button" class="btn btn-light btn-sm" @click="openCreate">
+        <button
+          v-if="$can('members.view_all')"
+          type="button"
+          class="btn btn-light btn-sm"
+          @click="openCreate"
+        >
           <i class="fa fa-plus me-1"></i> New Member
         </button>
       </template>

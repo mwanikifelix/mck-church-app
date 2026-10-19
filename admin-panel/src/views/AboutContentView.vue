@@ -170,6 +170,7 @@
           </div>
 
           <button
+            v-if="$can('membership.manage_status')"
             type="button"
             class="btn btn-primary btn-sm"
             :disabled="savingProfile"
@@ -189,7 +190,12 @@
             <h3 class="section-title mb-0">Gallery</h3>
             <p class="text-muted fs-sm mb-0">{{ gallery.length }} photos</p>
           </div>
-          <button type="button" class="btn btn-primary btn-sm" @click="openPhotoUpload">
+          <button
+            v-if="$can('ict.manage_content')"
+            type="button"
+            class="btn btn-primary btn-sm"
+            @click="openPhotoUpload"
+          >
             <i class="fa fa-upload me-1"></i> Upload Photo
           </button>
         </div>
@@ -210,7 +216,12 @@
             <h3 class="section-title mb-0">Facilities</h3>
             <p class="text-muted fs-sm mb-0">{{ facilities.length }} listed</p>
           </div>
-          <button type="button" class="btn btn-primary btn-sm" @click="openFacilityCreate">
+          <button
+            v-if="$can('content.manage')"
+            type="button"
+            class="btn btn-primary btn-sm"
+            @click="openFacilityCreate"
+          >
             <i class="fa fa-plus me-1"></i> New Facility
           </button>
         </div>
@@ -234,7 +245,12 @@
             <h3 class="section-title mb-0">Service Schedule</h3>
             <p class="text-muted fs-sm mb-0">{{ schedule.length }} rows</p>
           </div>
-          <button type="button" class="btn btn-primary btn-sm" @click="openScheduleCreate">
+          <button
+            v-if="$can('content.manage')"
+            type="button"
+            class="btn btn-primary btn-sm"
+            @click="openScheduleCreate"
+          >
             <i class="fa fa-plus me-1"></i> Add Row
           </button>
         </div>

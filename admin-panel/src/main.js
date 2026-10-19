@@ -22,6 +22,9 @@ import ToastHost from "@/components/ToastHost.vue";
 // OneUI directives
 import clickRipple from "@/directives/clickRipple";
 
+// Auth store, for the global $can() permission helper below
+import { useAuthStore } from "@/store/auth";
+
 // Bootstrap JS (dropdowns, modals, offcanvas)
 import * as bootstrap from "bootstrap";
 window.bootstrap = bootstrap;
@@ -45,5 +48,10 @@ app.directive("click-ripple", clickRipple);
 
 app.use(createPinia());
 app.use(router);
+
+// Global permission helper, mirrors the backend's permission codes:
+//   v-if="$can('content.manage')"   — hides controls the API would 403
+// Superusers pass every check.
+app.config.globalProperties.$can = (code) => useAuthStore().hasPermission(code);
 
 app.mount("#app");

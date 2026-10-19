@@ -7,7 +7,12 @@
       :subtitle="`${groups.length} ${groups.length === 1 ? 'group' : 'groups'}`"
     >
       <template #extra>
-        <button type="button" class="btn btn-light btn-sm" @click="openCreate">
+        <button
+          v-if="$can('hbc.manage_members')"
+          type="button"
+          class="btn btn-light btn-sm"
+          @click="openCreate"
+        >
           <i class="fa fa-plus me-1"></i> New HBC Group
         </button>
       </template>

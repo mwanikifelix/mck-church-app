@@ -104,8 +104,9 @@
         </div>
       </div>
 
-      <!-- Permission matrix, grouped by domain -->
-      <div class="block rounded-3">
+      <!-- Permission matrix, grouped by domain (superuser only — the
+           backend's role-permissions endpoint rejects everyone else) -->
+      <div v-if="isSuperuser" class="block rounded-3">
         <div
           class="block-header d-flex flex-column flex-sm-row gap-2 align-items-sm-center justify-content-between"
         >
@@ -188,6 +189,17 @@
           </div>
         </div>
       </div>
+
+      <!-- Shown instead of the matrix to non-superusers -->
+      <div v-else class="block rounded-3">
+        <div class="block-content p-4 text-center">
+          <i class="fa fa-lock fa-2x text-muted opacity-50 mb-2"></i>
+          <p class="fw-semibold mb-1">Permission matrix is admin-only</p>
+          <p class="fs-sm text-muted mb-0">
+            Ask a superuser to grant or revoke role permissions.
+          </p>
+        </div>
+      </div>
     </template>
     </div>
   </div>
@@ -196,13 +208,18 @@
 <script setup>
 import { ref, computed, onMounted } from "vue";
 import { useToast } from "../composables/useToast";
+import { useAuthStore } from "../store/auth";
 import { useRolesStore } from "../store/roles";
 import rolesService from "../services/roles.service";
 
+const auth = useAuthStore();
 const store = useRolesStore();
 const toast = useToast();
 const savingRoleId = ref(null);
 const dirtyCount = ref(0);
+
+// Only superusers may edit role permissions (mirrors IsSuperuserOnly)
+const isSuperuser = computed(() => !!auth.user?.is_superuser);
 
 /**
  * Group permission codes by their domain prefix ("youth.manage" -> "youth")

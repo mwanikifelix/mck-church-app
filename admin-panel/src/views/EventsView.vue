@@ -6,7 +6,12 @@
       :subtitle="`${events.length} recorded`"
     >
       <template #extra>
-        <button type="button" class="btn btn-light btn-sm" @click="openCreate">
+        <button
+          v-if="$can('events.manage')"
+          type="button"
+          class="btn btn-light btn-sm"
+          @click="openCreate"
+        >
           <i class="fa fa-plus me-1"></i> New Event
         </button>
       </template>

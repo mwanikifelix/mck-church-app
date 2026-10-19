@@ -15,7 +15,12 @@
           {{ versions.length }} {{ versions.length === 1 ? "version" : "versions" }}
         </p>
       </div>
-      <button type="button" class="btn btn-primary btn-sm" @click="openVersionCreate">
+      <button
+        v-if="$can('ict.manage_content')"
+        type="button"
+        class="btn btn-primary btn-sm"
+        @click="openVersionCreate"
+      >
         <i class="fa fa-plus me-1"></i> New Version
       </button>
     </div>
@@ -61,7 +66,12 @@
         <h3 class="section-title mb-0">Hymns</h3>
         <p class="text-muted fs-sm mb-0">{{ hymns.length }} hymns</p>
       </div>
-      <button type="button" class="btn btn-primary btn-sm" @click="openHymnCreate">
+      <button
+        v-if="$can('ict.manage_content')"
+        type="button"
+        class="btn btn-primary btn-sm"
+        @click="openHymnCreate"
+      >
         <i class="fa fa-plus me-1"></i> New Hymn
       </button>
     </div>

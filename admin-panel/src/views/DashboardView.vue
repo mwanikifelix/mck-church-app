@@ -78,6 +78,8 @@ import { ref, computed, onMounted } from "vue";
 import { useAuthStore } from "../store/auth";
 import membersService from "../services/members.service";
 import churchService from "../services/church.service";
+import branchesService from "../services/branches.service";
+import eventsService from "../services/events.service";
 
 const auth = useAuthStore();
 const loading = ref(true);
@@ -103,7 +105,10 @@ async function loadStat(index, fetcher) {
     const { data } = await fetcher();
     stats.value[index].value = (data.results || data).length;
   } catch {
+    // Most stats are permission-gated (e.g. members.view_all); a missing
+    // value is expected for restricted roles, so degrade quietly.
     stats.value[index].value = "—";
+    stats.value[index].hint = "Not available";
   }
 }
 
@@ -111,6 +116,8 @@ onMounted(async () => {
   await Promise.all([
     loadStat(0, () => membersService.list()),
     loadStat(1, () => churchService.listJoinRequests({ status: "pending" })),
+    loadStat(2, () => branchesService.list()),
+    loadStat(3, () => eventsService.list()),
   ]);
   loading.value = false;
 });

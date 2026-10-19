@@ -6,7 +6,12 @@
       :subtitle="`${departments.length} recorded`"
     >
       <template #extra>
-        <button type="button" class="btn btn-light btn-sm" @click="openCreate">
+        <button
+          v-if="$can('dept.manage_own')"
+          type="button"
+          class="btn btn-light btn-sm"
+          @click="openCreate"
+        >
           <i class="fa fa-plus me-1"></i> New Department
         </button>
       </template>

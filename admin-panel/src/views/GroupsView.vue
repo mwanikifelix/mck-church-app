@@ -7,7 +7,12 @@
       :subtitle="`${store.items.length} ${store.items.length === 1 ? 'group' : 'groups'}`"
     >
       <template #extra>
-        <button type="button" class="btn btn-light btn-sm" @click="openCreate">
+        <button
+          v-if="$can('groups.manage')"
+          type="button"
+          class="btn btn-light btn-sm"
+          @click="openCreate"
+        >
           <i class="fa fa-plus me-1"></i> New Group
         </button>
       </template>

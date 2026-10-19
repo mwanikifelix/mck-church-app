@@ -37,7 +37,7 @@
       <template #actions="{ row }">
         <div v-if="row" class="d-flex gap-2 justify-content-end">
           <button
-            v-if="row.status !== 'answered'"
+            v-if="row.status !== 'answered' && $can('prayer.manage')"
             type="button"
             class="btn btn-primary btn-sm"
             :disabled="rowBusy(row.id)"
@@ -79,7 +79,11 @@
       <template #counsellor="{ row }">{{ row.counsellor_name || "—" }}</template>
 
       <template #actions="{ row }">
-        <div v-if="row" class="d-flex gap-2 justify-content-end flex-wrap">
+        <!-- Counselling status changes need pastoral.view_all on the backend -->
+        <div
+          v-if="row && $can('pastoral.view_all')"
+          class="d-flex gap-2 justify-content-end flex-wrap"
+        >
           <button
             v-if="row.status === 'pending'"
             type="button"
