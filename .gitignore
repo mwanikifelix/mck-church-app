@@ -3,3 +3,32 @@
 .env
 .env.*
 !.env.example
+
+# dependencies
+node_modules/
+.pnp
+.pnp.js
+
+# build output
+dist/
+build/
+*.egg-info/
+staticfiles/
+
+# python
+__pycache__/
+*.py[cod]
+.venv/
+.pytest_cache/
+.coverage
+htmlcov/
+
+# editors / OS
+.idea/
+.DS_Store
+*.swp
+
+# stray/temp files
+*.timestamp-*.mjs
+*.backup
+*.log
