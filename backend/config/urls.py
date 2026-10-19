@@ -23,7 +23,8 @@ urlpatterns = [
     path("api/notifications/", include("apps.notifications.urls")),
     path("api/membership/", include("apps.membership.urls")),
     path("api/pastoral/", include("apps.pastoral.urls")),
-    path("api/chatbot/", include("apps.chatbot.urls")),   
+    path("api/chatbot/", include("apps.chatbot.urls")),
+    path("api/registration/", include("apps.registration.urls")),
    
 ]
 
