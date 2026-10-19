@@ -137,14 +137,10 @@ onMounted(() => {
       <slot name="page-top-content"></slot>
       <!--
         OneUI expects each view to provide its own .content wrapper.
-        Ours historically got it from AppLayout, so we supply it here
-        to keep every existing view correctly padded without edits.
-        Views that render their own BasePageHeading/.content should
-        move that markup out as they are migrated.
+        BasePageHeading supplies the first one (the branded band), and
+        the view wraps its body in a second .content below it.
       -->
-      <div class="content">
-        <RouterView />
-      </div>
+      <RouterView />
     </div>
     <!-- END Main Container -->
 

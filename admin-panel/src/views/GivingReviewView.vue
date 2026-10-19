@@ -1,15 +1,13 @@
 <template>
   <div>
-    <!-- Header -->
-    <div class="header-row mb-3">
-      <div>
-        <h2 class="section-title mb-0">Giving Review</h2>
-        <p class="text-muted fs-sm mb-0">
-          {{ donations.length }} {{ donations.length === 1 ? "donation" : "donations" }}
-        </p>
-      </div>
-    </div>
+    <BasePageHeading
+      title="Giving Review"
+      icon="fa-hand-holding-heart"
+      tone="green"
+      :subtitle="`${donations.length} ${donations.length === 1 ? 'donation' : 'donations'}`"
+    />
 
+    <div class="content">
     <AppDataTable
       :rows="donations"
       :columns="columns"
@@ -25,6 +23,7 @@
         <span v-else class="text-muted">—</span>
       </template>
     </AppDataTable>
+    </div>
   </div>
 </template>
 

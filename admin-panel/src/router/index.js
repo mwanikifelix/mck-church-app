@@ -2,7 +2,7 @@ import { createRouter, createWebHistory } from "vue-router";
 import { useAuthStore } from "../store/auth";
 
 const routes = [
-  { path: "/login", name: "login", component: () => import("../views/LoginView.vue") },
+  { path: "/login", name: "login", component: () => import("../views/LoginView.vue"), meta: { title: "Sign In" } },
   {
     path: "/",
     component: () => import("../layouts/AppLayout.vue"),
@@ -36,6 +36,11 @@ router.beforeEach((to) => {
   if (to.meta.requiresAuth && !auth.isAuthenticated) {
     return { name: "login" };
   }
+});
+
+router.afterEach((to) => {
+  const title = to.meta.title;
+  document.title = title ? `${title} — MCK Wesley Church` : "MCK Wesley Church — Admin";
 });
 
 export default router;

@@ -1,13 +1,12 @@
 <template>
   <div>
-    <!-- Header -->
-    <div class="header-row mb-3">
-      <div>
-        <h2 class="section-title mb-0">Pastoral Care</h2>
-        <p class="text-muted fs-sm mb-0">Prayer and counselling follow-up for the congregation</p>
-      </div>
-    </div>
+    <BasePageHeading
+      title="Pastoral Care"
+      icon="fa-hands-helping"
+      subtitle="Prayer and counselling follow-up for the congregation"
+    />
 
+    <div class="content">
     <!-- Prayer requests -->
     <h2 class="section-title mb-3">Prayer Requests</h2>
     <AppDataTable
@@ -183,6 +182,7 @@
         </button>
       </template>
     </AppModal>
+    </div>
   </div>
 </template>
 

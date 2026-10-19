@@ -33,15 +33,59 @@ body {
   }
 }
 
-// Page section title used across views
+// --- Page heading (branded hero band) -------------------------------
+// Every admin page opens with a Wesley-colored gradient band rendered by
+// BasePageHeading.vue. The band sits flush above the page content, so the
+// usual .content bottom padding is dropped to keep it tight.
+.page-heading {
+  padding: 1.25rem 0;
+  margin-bottom: 1rem;
+  color: $white;
+
+  &.page-heading-primary {
+    background: linear-gradient(135deg, $wesley-blue-dark 0%, $wesley-blue 55%, lighten($wesley-blue, 12%) 100%);
+  }
+
+  &.page-heading-green {
+    background: linear-gradient(135deg, darken($wesley-green, 10%) 0%, $wesley-green 55%, lighten($wesley-green, 10%) 100%);
+  }
+
+  &.page-heading-dark {
+    background: linear-gradient(135deg, $dark 0%, lighten($dark, 8%) 100%);
+  }
+
+  // Soften the band in dark mode so it doesn't glare
+  .dark & {
+    filter: brightness(0.85);
+  }
+}
+
+// Icon chip on the left of the heading
+.page-heading-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 auto;
+  width: 2.75rem;
+  height: 2.75rem;
+  border-radius: $border-radius-lg;
+  font-size: 1.25rem;
+  color: $white;
+  background: rgba($white, 0.18);
+  box-shadow: inset 0 0 0 1px rgba($white, 0.15);
+}
+
+// --- In-page section heading ----------------------------------------
+// Compact title for a section *inside* a page (e.g. "Prayer Requests"
+// under Pastoral Care). Page-level titles use BasePageHeading instead.
 .section-title {
-  font-size: 1.1rem;
+  font-size: 1rem;
   font-weight: 600;
   margin: 0;
   color: $body-color;
 }
 
-// Header row: title left, actions right — stacks on phones
+// Section header row: title left, actions right — stacks on phones
 .header-row {
   display: flex;
   flex-direction: column;

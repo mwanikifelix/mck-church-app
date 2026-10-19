@@ -1,18 +1,19 @@
 <template>
   <div>
-    <!-- Header -->
-    <div class="header-row mb-3">
-      <div>
-        <h2 class="section-title mb-0">HBC Groups</h2>
-        <p class="text-muted fs-sm mb-0">
-          {{ groups.length }} {{ groups.length === 1 ? "group" : "groups" }}
-        </p>
-      </div>
-      <button type="button" class="btn btn-primary btn-sm" @click="openCreate">
-        <i class="fa fa-plus me-1"></i> New HBC Group
-      </button>
-    </div>
+    <BasePageHeading
+      title="HBC Groups"
+      icon="fa-sitemap"
+      tone="green"
+      :subtitle="`${groups.length} ${groups.length === 1 ? 'group' : 'groups'}`"
+    >
+      <template #extra>
+        <button type="button" class="btn btn-light btn-sm" @click="openCreate">
+          <i class="fa fa-plus me-1"></i> New HBC Group
+        </button>
+      </template>
+    </BasePageHeading>
 
+    <div class="content">
     <AppDataTable
       :rows="groups"
       :columns="columns"
@@ -169,6 +170,7 @@
         </button>
       </template>
     </AppModal>
+    </div>
   </div>
 </template>
 

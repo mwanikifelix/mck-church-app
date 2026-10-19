@@ -1,16 +1,18 @@
 <template>
   <div>
-    <!-- Header -->
-    <div class="header-row mb-3">
-      <div>
-        <h2 class="section-title mb-0">Events</h2>
-        <p class="text-muted fs-sm mb-0">{{ events.length }} recorded</p>
-      </div>
-      <button type="button" class="btn btn-primary btn-sm" @click="openCreate">
-        <i class="fa fa-plus me-1"></i> New Event
-      </button>
-    </div>
+    <BasePageHeading
+      title="Events"
+      icon="fa-calendar-alt"
+      :subtitle="`${events.length} recorded`"
+    >
+      <template #extra>
+        <button type="button" class="btn btn-light btn-sm" @click="openCreate">
+          <i class="fa fa-plus me-1"></i> New Event
+        </button>
+      </template>
+    </BasePageHeading>
 
+    <div class="content">
     <AppDataTable
       :rows="events"
       :columns="columns"
@@ -121,6 +123,7 @@
         </button>
       </template>
     </AppModal>
+    </div>
   </div>
 </template>
 

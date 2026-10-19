@@ -1,24 +1,26 @@
 <template>
   <div>
     <!-- Header -->
-    <div class="header-row mb-3">
-      <div>
-        <h2 class="section-title mb-0">Roles &amp; Permissions</h2>
-        <p class="text-muted fs-sm mb-0">
-          {{ store.roles.length }} roles · {{ store.permissions.length }} permissions
-        </p>
-      </div>
-      <button
-        type="button"
-        class="btn btn-sm btn-alt-secondary"
-        :disabled="store.loading"
-        @click="store.fetchAll()"
-      >
-        <i class="fa fa-sync-alt me-1" :class="{ 'fa-spin': store.loading }"></i>
-        Refresh
-      </button>
-    </div>
+    <BasePageHeading
+      title="Roles &amp; Permissions"
+      icon="fa-user-shield"
+      tone="dark"
+      :subtitle="`${store.roles.length} roles · ${store.permissions.length} permissions`"
+    >
+      <template #extra>
+        <button
+          type="button"
+          class="btn btn-light btn-sm"
+          :disabled="store.loading"
+          @click="store.fetchAll()"
+        >
+          <i class="fa fa-sync-alt me-1" :class="{ 'fa-spin': store.loading }"></i>
+          Refresh
+        </button>
+      </template>
+    </BasePageHeading>
 
+    <div class="content">
     <div v-if="store.loading" class="block rounded-3">
       <div class="block-content text-center py-5">
         <div class="spinner-border text-primary mb-3"></div>
@@ -187,6 +189,7 @@
         </div>
       </div>
     </template>
+    </div>
   </div>
 </template>
 

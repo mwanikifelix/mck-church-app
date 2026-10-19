@@ -1,5 +1,12 @@
 <template>
   <div>
+    <BasePageHeading
+      title="Dashboard"
+      icon="fa-home"
+      :subtitle="`Welcome back, ${auth.user?.full_name || 'Church administrator'}`"
+    />
+
+    <div class="content">
     <!-- KPI row -->
     <div class="row g-3 mb-4">
       <div v-for="stat in stats" :key="stat.label" class="col-12 col-sm-6 col-xl-3">
@@ -61,6 +68,7 @@
           </div>
         </BaseBlock>
       </div>
+    </div>
     </div>
   </div>
 </template>

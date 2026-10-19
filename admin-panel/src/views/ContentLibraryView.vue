@@ -1,9 +1,16 @@
 <template>
   <div>
+    <BasePageHeading
+      title="Content Library"
+      icon="fa-book-open"
+      subtitle="Bible versions and hymns available in the church app"
+    />
+
+    <div class="content">
     <!-- Bible versions -->
     <div class="header-row mb-3">
       <div>
-        <h2 class="section-title mb-0">Bible Versions</h2>
+        <h3 class="section-title mb-0">Bible Versions</h3>
         <p class="text-muted fs-sm mb-0">
           {{ versions.length }} {{ versions.length === 1 ? "version" : "versions" }}
         </p>
@@ -51,7 +58,7 @@
     <!-- Hymns -->
     <div class="header-row mb-3">
       <div>
-        <h2 class="section-title mb-0">Hymns</h2>
+        <h3 class="section-title mb-0">Hymns</h3>
         <p class="text-muted fs-sm mb-0">{{ hymns.length }} hymns</p>
       </div>
       <button type="button" class="btn btn-primary btn-sm" @click="openHymnCreate">
@@ -268,6 +275,7 @@
         </button>
       </template>
     </AppModal>
+    </div>
   </div>
 </template>
 

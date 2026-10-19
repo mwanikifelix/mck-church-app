@@ -1,13 +1,12 @@
 <template>
   <div>
-    <!-- Header -->
-    <div class="header-row mb-3">
-      <div>
-        <h2 class="section-title mb-0">About Page Content</h2>
-        <p class="text-muted fs-sm mb-0">What visitors see on the public church website</p>
-      </div>
-    </div>
+    <BasePageHeading
+      title="About Page Content"
+      icon="fa-info-circle"
+      subtitle="What visitors see on the public church website"
+    />
 
+    <div class="content">
     <!-- Tabs -->
     <ul class="nav nav-tabs mb-3" role="tablist">
       <li class="nav-item" role="presentation">
@@ -481,6 +480,7 @@
         </button>
       </template>
     </AppModal>
+    </div>
   </div>
 </template>
 

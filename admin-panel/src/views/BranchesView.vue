@@ -1,16 +1,19 @@
 <template>
   <div>
-    <!-- Header -->
-    <div class="header-row mb-3">
-      <div>
-        <h2 class="section-title mb-0">Branches</h2>
-        <p class="text-muted fs-sm mb-0">{{ branches.length }} recorded</p>
-      </div>
-      <button type="button" class="btn btn-primary btn-sm" @click="openCreate">
-        <i class="fa fa-plus me-1"></i> New Branch
-      </button>
-    </div>
+    <BasePageHeading
+      title="Branches"
+      icon="fa-map-marker-alt"
+      tone="green"
+      :subtitle="`${branches.length} recorded`"
+    >
+      <template #extra>
+        <button type="button" class="btn btn-light btn-sm" @click="openCreate">
+          <i class="fa fa-plus me-1"></i> New Branch
+        </button>
+      </template>
+    </BasePageHeading>
 
+    <div class="content">
     <AppDataTable
       :rows="branches"
       :columns="columns"
@@ -126,6 +129,7 @@
         </button>
       </template>
     </AppModal>
+    </div>
   </div>
 </template>
 

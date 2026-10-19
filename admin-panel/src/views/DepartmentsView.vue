@@ -1,16 +1,18 @@
 <template>
   <div>
-    <!-- Header -->
-    <div class="header-row mb-3">
-      <div>
-        <h2 class="section-title mb-0">Departments</h2>
-        <p class="text-muted fs-sm mb-0">{{ departments.length }} recorded</p>
-      </div>
-      <button type="button" class="btn btn-primary btn-sm" @click="openCreate">
-        <i class="fa fa-plus me-1"></i> New Department
-      </button>
-    </div>
+    <BasePageHeading
+      title="Departments"
+      icon="fa-building"
+      :subtitle="`${departments.length} recorded`"
+    >
+      <template #extra>
+        <button type="button" class="btn btn-light btn-sm" @click="openCreate">
+          <i class="fa fa-plus me-1"></i> New Department
+        </button>
+      </template>
+    </BasePageHeading>
 
+    <div class="content">
     <AppDataTable
       class="mb-4"
       :rows="departments"
@@ -157,6 +159,7 @@
         </button>
       </template>
     </AppModal>
+    </div>
   </div>
 </template>
 

@@ -1,16 +1,18 @@
 <template>
   <div>
-    <!-- Header -->
-    <div class="header-row mb-3">
-      <div>
-        <h2 class="section-title mb-0">Announcements</h2>
-        <p class="text-muted fs-sm mb-0">{{ announcements.length }} recorded</p>
-      </div>
-      <button type="button" class="btn btn-primary btn-sm" @click="openCreate">
-        <i class="fa fa-plus me-1"></i> New Announcement
-      </button>
-    </div>
+    <BasePageHeading
+      title="Announcements"
+      icon="fa-bullhorn"
+      :subtitle="`${announcements.length} recorded`"
+    >
+      <template #extra>
+        <button type="button" class="btn btn-light btn-sm" @click="openCreate">
+          <i class="fa fa-plus me-1"></i> New Announcement
+        </button>
+      </template>
+    </BasePageHeading>
 
+    <div class="content">
     <AppDataTable
       :rows="announcements"
       :columns="columns"
@@ -100,6 +102,7 @@
         </button>
       </template>
     </AppModal>
+    </div>
   </div>
 </template>
 

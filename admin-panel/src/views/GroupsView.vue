@@ -1,18 +1,19 @@
 <template>
   <div>
-    <!-- Header -->
-    <div class="header-row mb-3">
-      <div>
-        <h2 class="section-title mb-0">Growth-Track Groups</h2>
-        <p class="text-muted fs-sm mb-0">
-          {{ store.items.length }} {{ store.items.length === 1 ? "group" : "groups" }}
-        </p>
-      </div>
-      <button type="button" class="btn btn-primary btn-sm" @click="openCreate">
-        <i class="fa fa-plus me-1"></i> New Group
-      </button>
-    </div>
+    <BasePageHeading
+      title="Growth-Track Groups"
+      icon="fa-project-diagram"
+      tone="green"
+      :subtitle="`${store.items.length} ${store.items.length === 1 ? 'group' : 'groups'}`"
+    >
+      <template #extra>
+        <button type="button" class="btn btn-light btn-sm" @click="openCreate">
+          <i class="fa fa-plus me-1"></i> New Group
+        </button>
+      </template>
+    </BasePageHeading>
 
+    <div class="content">
     <AppDataTable
       :rows="store.items"
       :columns="columns"
@@ -155,6 +156,7 @@
         </button>
       </template>
     </AppModal>
+    </div>
   </div>
 </template>
 

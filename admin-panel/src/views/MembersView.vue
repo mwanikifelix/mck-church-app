@@ -1,18 +1,18 @@
 <template>
   <div>
-    <!-- Header -->
-    <div class="header-row mb-3">
-      <div>
-        <h2 class="section-title mb-0">Members</h2>
-        <p class="text-muted fs-sm mb-0">
-          {{ members.length }} registered {{ members.length === 1 ? "member" : "members" }}
-        </p>
-      </div>
-      <button type="button" class="btn btn-primary btn-sm" @click="openCreate">
-        <i class="fa fa-plus me-1"></i> New Member
-      </button>
-    </div>
+    <BasePageHeading
+      title="Members"
+      icon="fa-users"
+      :subtitle="`${members.length} registered ${members.length === 1 ? 'member' : 'members'}`"
+    >
+      <template #extra>
+        <button type="button" class="btn btn-light btn-sm" @click="openCreate">
+          <i class="fa fa-plus me-1"></i> New Member
+        </button>
+      </template>
+    </BasePageHeading>
 
+    <div class="content">
     <AppDataTable
       :rows="members"
       :columns="columns"
@@ -125,6 +125,7 @@
         </button>
       </template>
     </AppModal>
+    </div>
   </div>
 </template>
 
