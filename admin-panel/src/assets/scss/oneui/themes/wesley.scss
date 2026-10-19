@@ -1,0 +1,55 @@
+//
+// Wesley Theme
+// MCK Wesley Church brand palette (blue / cream / green)
+// --------------------------------------------------
+
+// Include base files
+@import "base";
+
+// Generate color theme
+@include color-theme(
+  ".theme-wesley",
+  $theme-wesley-primary,
+  $theme-wesley-light,
+  $theme-wesley-lighter,
+  $theme-wesley-dark,
+  $theme-wesley-darker,
+  $theme-wesley-body-bg,
+  $theme-wesley-body-bg-dark,
+  $theme-wesley-body-bg-light,
+  $theme-wesley-body-color,
+  $theme-wesley-body-color-dark,
+  $theme-wesley-body-color-light,
+  $theme-wesley-link-color,
+  $theme-wesley-link-hover-color,
+  $theme-wesley-input-btn-focus-color,
+  $theme-wesley-input-btn-focus-box-shadow,
+  $theme-wesley-input-bg,
+  $theme-wesley-input-color,
+  $theme-wesley-input-border-color,
+  $theme-wesley-input-focus-bg,
+  $theme-wesley-input-focus-color,
+  $theme-wesley-input-focus-border-color,
+  $theme-wesley-header-bg,
+  $theme-wesley-header-dark-bg,
+  $theme-wesley-sidebar-bg,
+  $theme-wesley-sidebar-dark-bg,
+  $theme-wesley-side-overlay-bg
+);
+
+@include color-theme-dark(
+  ".theme-wesley",
+  $theme-wesley-primary,
+  $theme-wesley-light,
+  $theme-wesley-lighter,
+  $theme-wesley-dark,
+  $theme-wesley-darker,
+  $theme-wesley-body-bg,
+  $theme-wesley-body-bg-dark,
+  $theme-wesley-body-bg-light,
+  $theme-wesley-body-color,
+  $theme-wesley-body-color-dark,
+  $theme-wesley-body-color-light,
+  $theme-wesley-link-color,
+  $theme-wesley-link-hover-color
+);

@@ -1,0 +1,15 @@
+// MCK Wesley Church Admin — global stylesheet
+//
+// OneUI design system (Bootstrap 5 based) + Wesley brand theme
+// --------------------------------------------------
+
+// Full OneUI framework: Bootstrap, layout, components, icons
+@import "./assets/scss/main";
+
+// Color themes. Wesley is the default (see class on <html> in index.html).
+@import "./assets/scss/oneui/themes/wesley";
+@import "./assets/scss/oneui/themes/modern";
+@import "./assets/scss/oneui/themes/city";
+@import "./assets/scss/oneui/themes/flat";
+@import "./assets/scss/oneui/themes/amethyst";
+@import "./assets/scss/oneui/themes/smooth";

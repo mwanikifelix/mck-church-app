@@ -1,26 +1,49 @@
 import { createApp } from "vue";
 import { createPinia } from "pinia";
-import PrimeVue from "primevue/config";
-import Aura from "@primevue/themes/aura";
-import ToastService from "primevue/toastservice";
-import ConfirmationService from "primevue/confirmationservice";
 
-import "primeicons/primeicons.css";
+// OneUI design system (Bootstrap 5) + Wesley brand theme
+import "./styles.scss";
 
 import App from "./App.vue";
 import router from "./router";
 
+// OneUI template components
+import BaseBlock from "@/components/BaseBlock.vue";
+import BaseBackground from "@/components/BaseBackground.vue";
+import BasePageHeading from "@/components/BasePageHeading.vue";
+
+// Shared admin components
+import AppModal from "@/components/AppModal.vue";
+import AppDataTable from "@/components/AppDataTable.vue";
+import FormField from "@/components/FormField.vue";
+import StatCard from "@/components/StatCard.vue";
+import ToastHost from "@/components/ToastHost.vue";
+
+// OneUI directives
+import clickRipple from "@/directives/clickRipple";
+
+// Bootstrap JS (dropdowns, modals, offcanvas)
+import * as bootstrap from "bootstrap";
+window.bootstrap = bootstrap;
+
 const app = createApp(App);
+
+// Global components
+app.component("BaseBlock", BaseBlock);
+app.component("BaseBackground", BaseBackground);
+app.component("BasePageHeading", BasePageHeading);
+app.component("AppModal", AppModal);
+app.component("AppDataTable", AppDataTable);
+app.component("FormField", FormField);
+app.component("StatCard", StatCard);
+
+// Toasts are rendered by a single host mounted above the router view
+app.component("ToastHost", ToastHost);
+
+// Global directives
+app.directive("click-ripple", clickRipple);
 
 app.use(createPinia());
 app.use(router);
-app.use(PrimeVue, {
-  theme: {
-    preset: Aura,
-    options: { darkModeSelector: ".dark" },
-  },
-});
-app.use(ToastService);
-app.use(ConfirmationService);
 
 app.mount("#app");

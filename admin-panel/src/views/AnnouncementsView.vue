@@ -1,72 +1,160 @@
 <template>
   <div>
-    <div class="header-row">
-      <h2 class="section-title">Announcements</h2>
-      <Button label="New Announcement" icon="pi pi-plus" @click="showCreate = true" />
+    <!-- Header -->
+    <div class="header-row mb-3">
+      <div>
+        <h2 class="section-title mb-0">Announcements</h2>
+        <p class="text-muted fs-sm mb-0">{{ announcements.length }} recorded</p>
+      </div>
+      <button type="button" class="btn btn-primary btn-sm" @click="openCreate">
+        <i class="fa fa-plus me-1"></i> New Announcement
+      </button>
     </div>
-    <DataTable :value="announcements" :loading="loading" paginator :rows="15">
-      <Column field="title" header="Title" sortable />
-      <Column field="body" header="Body" />
-      <Column header="Pinned">
-        <template #body="{ data }">
-          <Tag v-if="data.is_pinned" value="Pinned" severity="warn" />
-        </template>
-      </Column>
-    </DataTable>
 
-    <Dialog v-model:visible="showCreate" header="New Announcement" modal style="width:420px">
-      <div class="form-field">
-        <label>Title</label>
-        <InputText v-model="form.title" class="w-full" />
-      </div>
-      <div class="form-field">
-        <label>Body</label>
-        <Textarea v-model="form.body" class="w-full" rows="4" />
-      </div>
-      <div class="form-field">
-        <label>Branch (leave blank for church-wide)</label>
-        <Select v-model="form.branch" :options="branches" optionLabel="name" optionValue="id" class="w-full" showClear placeholder="Church-wide" />
-      </div>
-      <div class="form-field checkbox-row">
-        <Checkbox v-model="form.is_pinned" binary inputId="pinned" />
-        <label for="pinned">Pin to top</label>
-      </div>
-      <template #footer>
-        <Button label="Cancel" text @click="showCreate = false" />
-        <Button label="Publish" :loading="creating" @click="submitCreate" />
+    <AppDataTable
+      :rows="announcements"
+      :columns="columns"
+      :loading="loading"
+      :page-size="15"
+      search-placeholder="Search announcements…"
+      export-name="announcements"
+      empty-text="No announcements yet. Publish the first one."
+      empty-icon="fa-bullhorn"
+    >
+      <template #pinned="{ row }">
+        <span
+          v-if="row.is_pinned"
+          class="badge rounded-pill bg-warning-subtle text-warning-emphasis"
+        >
+          <i class="fa fa-thumbtack me-1"></i> Pinned
+        </span>
+        <span v-else class="text-muted">—</span>
       </template>
-    </Dialog>
+    </AppDataTable>
+
+    <!-- Create dialog -->
+    <AppModal
+      v-model:visible="showCreate"
+      title="New Announcement"
+      subtitle="Publish a notice to the church"
+      size="sm"
+    >
+      <FormField label="Title" required :error="errors.title" field-id="a-title">
+        <input
+          id="a-title"
+          v-model="form.title"
+          type="text"
+          class="form-control"
+          :class="{ 'is-invalid': errors.title }"
+          placeholder="e.g. Sunday Service Moved to 9AM"
+        />
+      </FormField>
+
+      <FormField label="Body" required :error="errors.body" field-id="a-body">
+        <textarea
+          id="a-body"
+          v-model="form.body"
+          rows="4"
+          class="form-control"
+          :class="{ 'is-invalid': errors.body }"
+          placeholder="Write the announcement…"
+        ></textarea>
+      </FormField>
+
+      <FormField
+        label="Branch"
+        :error="errors.branch"
+        field-id="a-branch"
+        hint="Leave blank for church-wide"
+      >
+        <select id="a-branch" v-model="form.branch" class="form-select">
+          <option :value="null">Church-wide</option>
+          <option v-for="b in branches" :key="b.id" :value="b.id">
+            {{ b.name }}
+          </option>
+        </select>
+      </FormField>
+
+      <div class="form-check mb-3">
+        <input
+          id="a-pinned"
+          v-model="form.is_pinned"
+          type="checkbox"
+          class="form-check-input"
+        />
+        <label class="form-check-label" for="a-pinned">Pin to top</label>
+      </div>
+
+      <template #footer>
+        <button type="button" class="btn btn-alt-secondary btn-sm" @click="showCreate = false">
+          Cancel
+        </button>
+        <button
+          type="button"
+          class="btn btn-primary btn-sm"
+          :disabled="creating"
+          @click="submitCreate"
+        >
+          <span v-if="creating" class="spinner-border spinner-border-sm me-1"></span>
+          Publish
+        </button>
+      </template>
+    </AppModal>
   </div>
 </template>
 
 <script setup>
 import { ref, onMounted } from "vue";
-import DataTable from "primevue/datatable";
-import Column from "primevue/column";
-import Tag from "primevue/tag";
-import Button from "primevue/button";
-import Dialog from "primevue/dialog";
-import InputText from "primevue/inputtext";
-import Textarea from "primevue/textarea";
-import Select from "primevue/select";
-import Checkbox from "primevue/checkbox";
-import { useToast } from "primevue/usetoast";
+import { useToast } from "../composables/useToast";
 import contentService from "../services/content.service";
 import branchesService from "../services/branches.service";
 
 const toast = useToast();
+
 const announcements = ref([]);
 const branches = ref([]);
 const loading = ref(true);
 const showCreate = ref(false);
 const creating = ref(false);
-const form = ref({ title: "", body: "", branch: null, is_pinned: false });
+
+const columns = [
+  { field: "title", header: "Title", sortable: true, strong: true },
+  { field: "body", header: "Body" },
+  { field: "is_pinned", header: "Pinned", slot: "pinned" },
+];
+
+const blank = () => ({ title: "", body: "", branch: null, is_pinned: false });
+
+const form = ref(blank());
+const errors = ref({});
+
+function openCreate() {
+  form.value = blank();
+  errors.value = {};
+  showCreate.value = true;
+}
+
+function validate() {
+  const e = {};
+  if (!form.value.title.trim()) e.title = "Title is required.";
+  if (!form.value.body.trim()) e.body = "Announcement body is required.";
+  errors.value = e;
+  return Object.keys(e).length === 0;
+}
 
 async function fetchAnnouncements() {
   loading.value = true;
   try {
     const { data } = await contentService.listAnnouncements();
     announcements.value = data.results || data;
+  } catch {
+    toast.add({
+      severity: "error",
+      summary: "Could not load announcements",
+      detail: "Check that the API is running.",
+      life: 5000,
+    });
+    announcements.value = [];
   } finally {
     loading.value = false;
   }
@@ -82,15 +170,38 @@ async function fetchBranches() {
 }
 
 async function submitCreate() {
+  if (!validate()) return;
+
   creating.value = true;
   try {
     const { data } = await contentService.createAnnouncement(form.value);
     announcements.value.unshift(data);
     showCreate.value = false;
-    form.value = { title: "", body: "", branch: null, is_pinned: false };
+    form.value = blank();
     toast.add({ severity: "success", summary: "Announcement published", life: 2500 });
   } catch (e) {
-    toast.add({ severity: "error", summary: "Failed to publish", detail: JSON.stringify(e.response?.data), life: 4000 });
+    // Surface Django field errors next to their inputs when we can
+    const api = e.response?.data;
+    if (api && typeof api === "object") {
+      const mapped = {};
+      Object.entries(api).forEach(([k, v]) => {
+        mapped[k] = Array.isArray(v) ? v.join(" ") : String(v);
+      });
+      errors.value = { ...errors.value, ...mapped };
+      toast.add({
+        severity: "error",
+        summary: "Could not publish announcement",
+        detail: Object.values(mapped)[0],
+        life: 5000,
+      });
+    } else {
+      toast.add({
+        severity: "error",
+        summary: "Could not publish announcement",
+        detail: e.message,
+        life: 5000,
+      });
+    }
   } finally {
     creating.value = false;
   }
@@ -101,13 +212,3 @@ onMounted(() => {
   fetchBranches();
 });
 </script>
-
-<style scoped>
-.section-title { font-size: 1.1rem; font-weight: 600; margin: 0; color: #1e293b; }
-.header-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem; }
-.form-field { margin-bottom: 1rem; }
-.form-field label { display: block; margin-bottom: 0.35rem; font-size: 0.85rem; color: #475569; }
-.checkbox-row { display: flex; align-items: center; gap: 0.5rem; }
-.checkbox-row label { margin: 0; }
-.w-full { width: 100%; }
-</style>

@@ -1,0 +1,76 @@
+//
+// Custom Main — MCK Wesley Church Admin
+//
+// Add your own styles or override existing ones.
+//
+// This file is included last, so you have access
+// to all Bootstrap and OneUI functions/mixins/styles etc
+// --------------------------------------------------
+
+// --- Wesley admin overrides ---
+
+// Bootstrap compiles body's background once, at build time, so it would stay
+// cream in dark mode. Inherit from <html> so it tracks the active theme.
+body {
+  background-color: inherit;
+}
+
+// OneUI ships the fixed page header as a translucent white with no blur, so
+// scrolled content bleeds straight through it (very visible under the wide
+// permission matrix). Frosted glass restores the intent and keeps the title
+// legible over any content.
+#page-header {
+  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(12px);
+}
+
+// Content padding: tighter on phones, roomier on desktops
+.content {
+  padding: 1rem;
+
+  @include media-breakpoint-up(md) {
+    padding: 1.5rem;
+  }
+}
+
+// Page section title used across views
+.section-title {
+  font-size: 1.1rem;
+  font-weight: 600;
+  margin: 0;
+  color: $body-color;
+}
+
+// Header row: title left, actions right — stacks on phones
+.header-row {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  align-items: stretch;
+  margin-bottom: 1rem;
+
+  @include media-breakpoint-up(sm) {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+  }
+}
+
+// Stat card (dashboard KPI)
+.stat-card-icon {
+  font-size: 1.75rem;
+  line-height: 1;
+}
+
+// Fix for wide tables inside narrow containers
+.table-responsive {
+  -webkit-overflow-scrolling: touch;
+}
+
+// Modal body scrolls rather than overflowing the viewport
+@media (max-width: 575.98px) {
+  .modal-dialog {
+    max-width: calc(100% - 1rem);
+    margin: 0.5rem auto;
+  }
+}

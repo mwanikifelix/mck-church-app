@@ -1,76 +1,173 @@
 <template>
   <div>
-    <div class="header-row">
-      <h2 class="section-title">Departments</h2>
-      <Button label="New Department" icon="pi pi-plus" @click="showCreate = true" />
+    <!-- Header -->
+    <div class="header-row mb-3">
+      <div>
+        <h2 class="section-title mb-0">Departments</h2>
+        <p class="text-muted fs-sm mb-0">{{ departments.length }} recorded</p>
+      </div>
+      <button type="button" class="btn btn-primary btn-sm" @click="openCreate">
+        <i class="fa fa-plus me-1"></i> New Department
+      </button>
     </div>
-    <DataTable :value="departments" :loading="loadingDepts" paginator :rows="10" class="mb-4">
-      <Column field="name" header="Name" sortable />
-      <Column field="leader_name" header="Leader" />
-      <Column header="Meeting">
-        <template #body="{ data }">{{ data.meeting_day }} {{ data.meeting_time }}</template>
-      </Column>
-    </DataTable>
 
-    <h2 class="section-title">Pending Join Requests</h2>
-    <DataTable :value="pendingRequests" :loading="loadingRequests" paginator :rows="10">
-      <template #empty>No pending join requests.</template>
-      <Column header="Member"><template #body="{ data }">{{ data.user_name }}</template></Column>
-      <Column header="Department"><template #body="{ data }">{{ departmentName(data.department) }}</template></Column>
-      <Column field="message" header="Message" />
-      <Column header="Actions">
-        <template #body="{ data }">
-          <Button label="Approve" size="small" severity="success" class="mr-2" :loading="acting === data.id" @click="handle(data, 'approve')" />
-          <Button label="Reject" size="small" severity="danger" outlined :loading="acting === data.id" @click="handle(data, 'reject')" />
-        </template>
-      </Column>
-    </DataTable>
-
-    <Dialog v-model:visible="showCreate" header="New Department" modal style="width:420px">
-      <div class="form-field">
-        <label>Name</label>
-        <InputText v-model="form.name" class="w-full" />
-      </div>
-      <div class="form-field">
-        <label>Description</label>
-        <Textarea v-model="form.description" class="w-full" rows="3" />
-      </div>
-      <div class="form-field">
-        <label>Branch (leave blank for church-wide)</label>
-        <Select v-model="form.branch" :options="branches" optionLabel="name" optionValue="id" class="w-full" showClear placeholder="Church-wide" />
-      </div>
-      <div class="form-row">
-        <div class="form-field">
-          <label>Meeting Day</label>
-          <InputText v-model="form.meeting_day" class="w-full" placeholder="e.g. Tuesday" />
-        </div>
-        <div class="form-field">
-          <label>Meeting Time</label>
-          <InputText v-model="form.meeting_time" class="w-full" placeholder="e.g. 5:30PM" />
-        </div>
-      </div>
-      <template #footer>
-        <Button label="Cancel" text @click="showCreate = false" />
-        <Button label="Create" :loading="creating" @click="submitCreate" />
+    <AppDataTable
+      class="mb-4"
+      :rows="departments"
+      :columns="columns"
+      :loading="loadingDepts"
+      :page-size="15"
+      :search-fields="departmentSearchFields"
+      search-placeholder="Search departments…"
+      export-name="departments"
+      empty-text="No departments yet. Create the first one."
+      empty-icon="fa-building"
+    >
+      <template #meeting="{ row }">
+        <span v-if="row.meeting_day || row.meeting_time">
+          {{ row.meeting_day }} {{ row.meeting_time }}
+        </span>
+        <span v-else class="text-muted">—</span>
       </template>
-    </Dialog>
+    </AppDataTable>
+
+    <!-- Pending join requests -->
+    <h2 class="section-title mb-3">Pending Join Requests</h2>
+
+    <AppDataTable
+      :rows="pendingRequests"
+      :columns="requestColumns"
+      :loading="loadingRequests"
+      :page-size="15"
+      :search-fields="requestSearchFields"
+      search-placeholder="Search requests…"
+      empty-text="No pending join requests."
+      empty-icon="fa-user-check"
+    >
+      <template #department="{ row }">
+        {{ departmentName(row.department) }}
+      </template>
+
+      <template #actions="{ row }">
+        <div class="d-flex gap-2 justify-content-end">
+          <button
+            type="button"
+            class="btn btn-success btn-sm"
+            :disabled="acting === row.id"
+            @click="handle(row, 'approve')"
+          >
+            <span v-if="acting === row.id" class="spinner-border spinner-border-sm me-1"></span>
+            Approve
+          </button>
+          <button
+            type="button"
+            class="btn btn-outline-danger btn-sm"
+            :disabled="acting === row.id"
+            @click="handle(row, 'reject')"
+          >
+            <span v-if="acting === row.id" class="spinner-border spinner-border-sm me-1"></span>
+            Reject
+          </button>
+        </div>
+      </template>
+    </AppDataTable>
+
+    <!-- Create dialog -->
+    <AppModal
+      v-model:visible="showCreate"
+      title="New Department"
+      subtitle="Add a ministry department"
+      size="sm"
+    >
+      <FormField label="Name" required :error="errors.name" field-id="d-name">
+        <input
+          id="d-name"
+          v-model="form.name"
+          type="text"
+          class="form-control"
+          :class="{ 'is-invalid': errors.name }"
+          placeholder="e.g. Youth Ministry"
+        />
+      </FormField>
+
+      <FormField label="Description" :error="errors.description" field-id="d-desc">
+        <textarea
+          id="d-desc"
+          v-model="form.description"
+          rows="3"
+          class="form-control"
+          :class="{ 'is-invalid': errors.description }"
+          placeholder="What does this department do?"
+        ></textarea>
+      </FormField>
+
+      <FormField
+        label="Branch"
+        :error="errors.branch"
+        field-id="d-branch"
+        hint="Leave blank for church-wide"
+      >
+        <select id="d-branch" v-model="form.branch" class="form-select">
+          <option :value="null">Church-wide</option>
+          <option v-for="b in branches" :key="b.id" :value="b.id">
+            {{ b.name }}
+          </option>
+        </select>
+      </FormField>
+
+      <div class="row g-3">
+        <div class="col-12 col-sm-6">
+          <FormField label="Meeting day" :error="errors.meeting_day" field-id="d-day">
+            <input
+              id="d-day"
+              v-model="form.meeting_day"
+              type="text"
+              class="form-control"
+              :class="{ 'is-invalid': errors.meeting_day }"
+              placeholder="e.g. Tuesday"
+            />
+          </FormField>
+        </div>
+        <div class="col-12 col-sm-6">
+          <FormField label="Meeting time" :error="errors.meeting_time" field-id="d-time">
+            <input
+              id="d-time"
+              v-model="form.meeting_time"
+              type="text"
+              class="form-control"
+              :class="{ 'is-invalid': errors.meeting_time }"
+              placeholder="e.g. 5:30PM"
+            />
+          </FormField>
+        </div>
+      </div>
+
+      <template #footer>
+        <button type="button" class="btn btn-alt-secondary btn-sm" @click="showCreate = false">
+          Cancel
+        </button>
+        <button
+          type="button"
+          class="btn btn-primary btn-sm"
+          :disabled="creating"
+          @click="submitCreate"
+        >
+          <span v-if="creating" class="spinner-border spinner-border-sm me-1"></span>
+          Create department
+        </button>
+      </template>
+    </AppModal>
   </div>
 </template>
 
 <script setup>
 import { ref, onMounted } from "vue";
-import DataTable from "primevue/datatable";
-import Column from "primevue/column";
-import Button from "primevue/button";
-import Dialog from "primevue/dialog";
-import InputText from "primevue/inputtext";
-import Textarea from "primevue/textarea";
-import Select from "primevue/select";
-import { useToast } from "primevue/usetoast";
+import { useToast } from "../composables/useToast";
 import churchService from "../services/church.service";
 import branchesService from "../services/branches.service";
 
 const toast = useToast();
+
 const departments = ref([]);
 const pendingRequests = ref([]);
 const branches = ref([]);
@@ -79,10 +176,49 @@ const loadingRequests = ref(true);
 const acting = ref(null);
 const showCreate = ref(false);
 const creating = ref(false);
-const form = ref({ name: "", description: "", branch: null, meeting_day: "", meeting_time: "" });
+
+const columns = [
+  { field: "name", header: "Name", sortable: true, strong: true },
+  { field: "leader_name", header: "Leader", sortable: true },
+  { header: "Meeting", slot: "meeting" },
+];
+// The Meeting column has no plain field, so search across its parts explicitly
+const departmentSearchFields = ["name", "leader_name", "meeting_day", "meeting_time"];
+
+const requestColumns = [
+  { field: "user_name", header: "Member", strong: true },
+  { field: "department", header: "Department", slot: "department" },
+  { field: "message", header: "Message" },
+  { header: "Actions", slot: "actions", align: "end", sortable: false },
+];
+const requestSearchFields = ["user_name", "message", (r) => departmentName(r.department)];
+
+const blank = () => ({
+  name: "",
+  description: "",
+  branch: null,
+  meeting_day: "",
+  meeting_time: "",
+});
+
+const form = ref(blank());
+const errors = ref({});
 
 function departmentName(id) {
   return departments.value.find((d) => d.id === id)?.name || id;
+}
+
+function openCreate() {
+  form.value = blank();
+  errors.value = {};
+  showCreate.value = true;
+}
+
+function validate() {
+  const e = {};
+  if (!form.value.name.trim()) e.name = "Department name is required.";
+  errors.value = e;
+  return Object.keys(e).length === 0;
 }
 
 async function fetchDepartments() {
@@ -129,15 +265,38 @@ async function handle(request, action) {
 }
 
 async function submitCreate() {
+  if (!validate()) return;
+
   creating.value = true;
   try {
     const { data } = await churchService.createDepartment(form.value);
     departments.value.unshift(data);
     showCreate.value = false;
-    form.value = { name: "", description: "", branch: null, meeting_day: "", meeting_time: "" };
+    form.value = blank();
     toast.add({ severity: "success", summary: "Department created", life: 2500 });
   } catch (e) {
-    toast.add({ severity: "error", summary: "Failed to create", detail: JSON.stringify(e.response?.data), life: 4000 });
+    // Surface Django field errors next to their inputs when we can
+    const api = e.response?.data;
+    if (api && typeof api === "object") {
+      const mapped = {};
+      Object.entries(api).forEach(([k, v]) => {
+        mapped[k] = Array.isArray(v) ? v.join(" ") : String(v);
+      });
+      errors.value = { ...errors.value, ...mapped };
+      toast.add({
+        severity: "error",
+        summary: "Could not create department",
+        detail: Object.values(mapped)[0],
+        life: 5000,
+      });
+    } else {
+      toast.add({
+        severity: "error",
+        summary: "Could not create department",
+        detail: e.message,
+        life: 5000,
+      });
+    }
   } finally {
     creating.value = false;
   }
@@ -149,15 +308,3 @@ onMounted(() => {
   fetchBranches();
 });
 </script>
-
-<style scoped>
-.section-title { font-size: 1.1rem; font-weight: 600; margin: 0 0 0.75rem; color: #1e293b; }
-.header-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem; }
-.mb-4 { margin-bottom: 2rem; }
-.mr-2 { margin-right: 0.5rem; }
-.form-field { margin-bottom: 1rem; }
-.form-field label { display: block; margin-bottom: 0.35rem; font-size: 0.85rem; color: #475569; }
-.form-row { display: flex; gap: 1rem; }
-.form-row .form-field { flex: 1; }
-.w-full { width: 100%; }
-</style>

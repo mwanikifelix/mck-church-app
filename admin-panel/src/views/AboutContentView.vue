@@ -1,186 +1,492 @@
 <template>
-  <Tabs value="0">
-    <TabList>
-      <Tab value="0">Church Profile</Tab>
-      <Tab value="1">Gallery</Tab>
-      <Tab value="2">Facilities</Tab>
-      <Tab value="3">Service Schedule</Tab>
-    </TabList>
-    <TabPanels>
-      <TabPanel value="0">
-        <div class="panel-body" v-if="!loadingProfile">
-          <div class="form-field">
-            <label>Church Name</label>
-            <InputText v-model="profile.name" class="w-full" />
-          </div>
-          <div class="form-field">
-            <label>Tagline</label>
-            <InputText v-model="profile.tagline" class="w-full" placeholder="e.g. Witnessing for Christ in Transforming lives" />
-          </div>
-          <div class="form-row">
-            <div class="form-field">
-              <label>Theme of the Year</label>
-              <InputText v-model="profile.theme_title" class="w-full" />
-            </div>
-            <div class="form-field">
-              <label>Scripture Reference</label>
-              <InputText v-model="profile.theme_scripture_reference" class="w-full" placeholder="e.g. Genesis 8:1a" />
-            </div>
-          </div>
-          <div class="form-field">
-            <label>Theme Scripture Text</label>
-            <Textarea v-model="profile.theme_scripture_text" class="w-full" rows="2" />
-          </div>
-          <div class="form-field">
-            <label>Mission</label>
-            <Textarea v-model="profile.mission" class="w-full" rows="2" />
-          </div>
-          <div class="form-field">
-            <label>Vision</label>
-            <Textarea v-model="profile.vision" class="w-full" rows="2" />
-          </div>
-          <div class="form-field">
-            <label>Motto</label>
-            <InputText v-model="profile.motto" class="w-full" />
-          </div>
-          <div class="form-row">
-            <div class="form-field">
-              <label>Email</label>
-              <InputText v-model="profile.email" class="w-full" />
-            </div>
-            <div class="form-field">
-              <label>Location</label>
-              <InputText v-model="profile.location" class="w-full" />
-            </div>
-          </div>
-          <Button label="Save Church Profile" :loading="savingProfile" @click="saveProfile" />
-        </div>
-      </TabPanel>
+  <div>
+    <!-- Header -->
+    <div class="header-row mb-3">
+      <div>
+        <h2 class="section-title mb-0">About Page Content</h2>
+        <p class="text-muted fs-sm mb-0">What visitors see on the public church website</p>
+      </div>
+    </div>
 
-      <TabPanel value="1">
-        <div class="header-row">
-          <span></span>
-          <Button label="Upload Photo" icon="pi pi-upload" @click="showPhotoUpload = true" />
+    <!-- Tabs -->
+    <ul class="nav nav-tabs mb-3" role="tablist">
+      <li class="nav-item" role="presentation">
+        <button
+          type="button"
+          class="nav-link"
+          :class="{ active: tab === 'profile' }"
+          @click="tab = 'profile'"
+        >
+          Church Profile
+        </button>
+      </li>
+      <li class="nav-item" role="presentation">
+        <button
+          type="button"
+          class="nav-link"
+          :class="{ active: tab === 'gallery' }"
+          @click="tab = 'gallery'"
+        >
+          Gallery
+        </button>
+      </li>
+      <li class="nav-item" role="presentation">
+        <button
+          type="button"
+          class="nav-link"
+          :class="{ active: tab === 'facilities' }"
+          @click="tab = 'facilities'"
+        >
+          Facilities
+        </button>
+      </li>
+      <li class="nav-item" role="presentation">
+        <button
+          type="button"
+          class="nav-link"
+          :class="{ active: tab === 'schedule' }"
+          @click="tab = 'schedule'"
+        >
+          Service Schedule
+        </button>
+      </li>
+    </ul>
+
+    <div class="tab-content">
+      <!-- Church profile -->
+      <div v-show="tab === 'profile'" class="tab-pane fade show active" role="tabpanel">
+        <div v-if="loadingProfile" class="text-center py-5">
+          <span class="spinner-border spinner-border-sm" role="status"></span>
         </div>
-        <div class="gallery-grid">
+
+        <div v-else class="panel-body" style="max-width: 600px">
+          <FormField
+            label="Church Name"
+            required
+            :error="profileErrors.name"
+            field-id="ac-name"
+          >
+            <input
+              id="ac-name"
+              v-model="profile.name"
+              type="text"
+              class="form-control"
+              :class="{ 'is-invalid': profileErrors.name }"
+            />
+          </FormField>
+
+          <FormField
+            label="Tagline"
+            :error="profileErrors.tagline"
+            field-id="ac-tagline"
+            hint="Shown under the church name"
+          >
+            <input
+              id="ac-tagline"
+              v-model="profile.tagline"
+              type="text"
+              class="form-control"
+              :class="{ 'is-invalid': profileErrors.tagline }"
+              placeholder="e.g. Witnessing for Christ in Transforming lives"
+            />
+          </FormField>
+
+          <div class="row g-3">
+            <div class="col-12 col-sm-6">
+              <FormField label="Theme of the Year" field-id="ac-theme">
+                <input
+                  id="ac-theme"
+                  v-model="profile.theme_title"
+                  type="text"
+                  class="form-control"
+                />
+              </FormField>
+            </div>
+            <div class="col-12 col-sm-6">
+              <FormField label="Scripture Reference" field-id="ac-theme-ref">
+                <input
+                  id="ac-theme-ref"
+                  v-model="profile.theme_scripture_reference"
+                  type="text"
+                  class="form-control"
+                  placeholder="e.g. Genesis 8:1a"
+                />
+              </FormField>
+            </div>
+          </div>
+
+          <FormField label="Theme Scripture Text" field-id="ac-theme-text">
+            <textarea
+              id="ac-theme-text"
+              v-model="profile.theme_scripture_text"
+              rows="2"
+              class="form-control"
+            ></textarea>
+          </FormField>
+
+          <FormField label="Mission" field-id="ac-mission">
+            <textarea
+              id="ac-mission"
+              v-model="profile.mission"
+              rows="2"
+              class="form-control"
+            ></textarea>
+          </FormField>
+
+          <FormField label="Vision" field-id="ac-vision">
+            <textarea
+              id="ac-vision"
+              v-model="profile.vision"
+              rows="2"
+              class="form-control"
+            ></textarea>
+          </FormField>
+
+          <FormField label="Motto" field-id="ac-motto">
+            <input id="ac-motto" v-model="profile.motto" type="text" class="form-control" />
+          </FormField>
+
+          <div class="row g-3">
+            <div class="col-12 col-sm-6">
+              <FormField label="Email" :error="profileErrors.email" field-id="ac-email">
+                <input
+                  id="ac-email"
+                  v-model="profile.email"
+                  type="email"
+                  class="form-control"
+                  :class="{ 'is-invalid': profileErrors.email }"
+                />
+              </FormField>
+            </div>
+            <div class="col-12 col-sm-6">
+              <FormField label="Location" field-id="ac-location">
+                <input
+                  id="ac-location"
+                  v-model="profile.location"
+                  type="text"
+                  class="form-control"
+                />
+              </FormField>
+            </div>
+          </div>
+
+          <button
+            type="button"
+            class="btn btn-primary btn-sm"
+            :disabled="savingProfile"
+            @click="saveProfile"
+          >
+            <span v-if="savingProfile" class="spinner-border spinner-border-sm me-1"></span>
+            <i v-else class="fa fa-save me-1"></i>
+            Save Church Profile
+          </button>
+        </div>
+      </div>
+
+      <!-- Gallery -->
+      <div v-show="tab === 'gallery'" class="tab-pane fade show active" role="tabpanel">
+        <div class="header-row mb-3">
+          <div>
+            <h3 class="section-title mb-0">Gallery</h3>
+            <p class="text-muted fs-sm mb-0">{{ gallery.length }} photos</p>
+          </div>
+          <button type="button" class="btn btn-primary btn-sm" @click="openPhotoUpload">
+            <i class="fa fa-upload me-1"></i> Upload Photo
+          </button>
+        </div>
+
+        <div v-if="gallery.length" class="gallery-grid">
           <div v-for="photo in gallery" :key="photo.id" class="gallery-item">
             <img :src="photo.image" :alt="photo.caption" />
             <div class="gallery-caption">{{ photo.caption }}</div>
           </div>
         </div>
-      </TabPanel>
-
-      <TabPanel value="2">
-        <div class="header-row">
-          <span></span>
-          <Button label="New Facility" icon="pi pi-plus" @click="showFacilityCreate = true" />
-        </div>
-        <DataTable :value="facilities" :loading="loadingFacilities" paginator :rows="10">
-          <Column field="name" header="Name" sortable />
-          <Column field="description" header="Description" />
-        </DataTable>
-      </TabPanel>
-
-      <TabPanel value="3">
-        <div class="header-row">
-          <span></span>
-          <Button label="Add Row" icon="pi pi-plus" @click="showScheduleCreate = true" />
-        </div>
-        <DataTable :value="schedule" :loading="loadingSchedule" paginator :rows="15">
-          <Column field="name" header="Service" sortable />
-          <Column field="day" header="Day" sortable />
-          <Column field="time" header="Time" sortable />
-        </DataTable>
-      </TabPanel>
-    </TabPanels>
-  </Tabs>
-
-  <Dialog v-model:visible="showPhotoUpload" header="Upload Gallery Photo" modal style="width:420px">
-    <div class="form-field">
-      <label>Image</label>
-      <FileUpload mode="basic" :auto="false" chooseLabel="Choose Image" accept="image/*" @select="onPhotoSelect" />
-      <span v-if="selectedPhoto" class="file-name">{{ selectedPhoto.name }}</span>
-    </div>
-    <div class="form-field">
-      <label>Caption</label>
-      <InputText v-model="photoForm.caption" class="w-full" />
-    </div>
-    <div class="form-field">
-      <label>Branch (optional)</label>
-      <Select v-model="photoForm.branch" :options="branches" optionLabel="name" optionValue="id" class="w-full" showClear placeholder="Church-wide" />
-    </div>
-    <template #footer>
-      <Button label="Cancel" text @click="showPhotoUpload = false" />
-      <Button label="Upload" :loading="uploadingPhoto" @click="submitPhoto" />
-    </template>
-  </Dialog>
-
-  <Dialog v-model:visible="showFacilityCreate" header="New Facility" modal style="width:420px">
-    <div class="form-field">
-      <label>Name</label>
-      <InputText v-model="facilityForm.name" class="w-full" placeholder="e.g. Multi Purpose Hall" />
-    </div>
-    <div class="form-field">
-      <label>Description</label>
-      <Textarea v-model="facilityForm.description" class="w-full" rows="3" />
-    </div>
-    <div class="form-field">
-      <label>Branch (optional)</label>
-      <Select v-model="facilityForm.branch" :options="branches" optionLabel="name" optionValue="id" class="w-full" showClear placeholder="Church-wide" />
-    </div>
-    <template #footer>
-      <Button label="Cancel" text @click="showFacilityCreate = false" />
-      <Button label="Create" :loading="creatingFacility" @click="submitFacility" />
-    </template>
-  </Dialog>
-
-  <Dialog v-model:visible="showScheduleCreate" header="New Schedule Row" modal style="width:420px">
-    <div class="form-field">
-      <label>Service Name</label>
-      <InputText v-model="scheduleForm.name" class="w-full" placeholder="e.g. 1st Service" />
-    </div>
-    <div class="form-row">
-      <div class="form-field">
-        <label>Day</label>
-        <InputText v-model="scheduleForm.day" class="w-full" placeholder="e.g. Sunday" />
+        <p v-else class="text-muted mb-0">No photos yet. Upload the first one.</p>
       </div>
-      <div class="form-field">
-        <label>Time</label>
-        <InputText v-model="scheduleForm.time" class="w-full" placeholder="e.g. 8:00AM" />
+
+      <!-- Facilities -->
+      <div v-show="tab === 'facilities'" class="tab-pane fade show active" role="tabpanel">
+        <div class="header-row mb-3">
+          <div>
+            <h3 class="section-title mb-0">Facilities</h3>
+            <p class="text-muted fs-sm mb-0">{{ facilities.length }} listed</p>
+          </div>
+          <button type="button" class="btn btn-primary btn-sm" @click="openFacilityCreate">
+            <i class="fa fa-plus me-1"></i> New Facility
+          </button>
+        </div>
+
+        <AppDataTable
+          :rows="facilities"
+          :columns="facilityColumns"
+          :loading="loadingFacilities"
+          :page-size="10"
+          search-placeholder="Search facilities…"
+          export-name="facilities"
+          empty-text="No facilities yet."
+          empty-icon="fa-building"
+        />
+      </div>
+
+      <!-- Service schedule -->
+      <div v-show="tab === 'schedule'" class="tab-pane fade show active" role="tabpanel">
+        <div class="header-row mb-3">
+          <div>
+            <h3 class="section-title mb-0">Service Schedule</h3>
+            <p class="text-muted fs-sm mb-0">{{ schedule.length }} rows</p>
+          </div>
+          <button type="button" class="btn btn-primary btn-sm" @click="openScheduleCreate">
+            <i class="fa fa-plus me-1"></i> Add Row
+          </button>
+        </div>
+
+        <AppDataTable
+          :rows="schedule"
+          :columns="scheduleColumns"
+          :loading="loadingSchedule"
+          :page-size="15"
+          search-placeholder="Search services…"
+          export-name="service-schedule"
+          empty-text="No services scheduled yet."
+          empty-icon="fa-clock"
+        />
       </div>
     </div>
-    <div class="form-field">
-      <label>Order</label>
-      <InputNumber v-model="scheduleForm.order" class="w-full" />
-    </div>
-    <div class="form-field">
-      <label>Branch (optional)</label>
-      <Select v-model="scheduleForm.branch" :options="branches" optionLabel="name" optionValue="id" class="w-full" showClear placeholder="Church-wide" />
-    </div>
-    <template #footer>
-      <Button label="Cancel" text @click="showScheduleCreate = false" />
-      <Button label="Create" :loading="creatingSchedule" @click="submitSchedule" />
-    </template>
-  </Dialog>
+
+    <!-- Upload gallery photo dialog -->
+    <AppModal
+      v-model:visible="showPhotoUpload"
+      title="Upload Gallery Photo"
+      subtitle="Appears in the public gallery"
+      size="sm"
+    >
+      <FormField label="Image" required :error="photoErrors.image" field-id="ac-photo">
+        <input
+          id="ac-photo"
+          type="file"
+          class="form-control"
+          :class="{ 'is-invalid': photoErrors.image }"
+          accept="image/*"
+          @change="onPhotoChange"
+        />
+        <div v-if="selectedPhoto" class="fs-sm text-muted mt-1">
+          <i class="fa fa-image me-1"></i>{{ selectedPhoto.name }}
+        </div>
+      </FormField>
+
+      <FormField
+        label="Caption"
+        :error="photoErrors.caption"
+        field-id="ac-caption"
+        hint="Shown under the photo"
+      >
+        <input
+          id="ac-caption"
+          v-model="photoForm.caption"
+          type="text"
+          class="form-control"
+          :class="{ 'is-invalid': photoErrors.caption }"
+          placeholder="e.g. Easter Sunday service"
+        />
+      </FormField>
+
+      <FormField
+        label="Branch"
+        :error="photoErrors.branch"
+        field-id="ac-photo-branch"
+        hint="Leave blank for church-wide"
+      >
+        <select id="ac-photo-branch" v-model="photoForm.branch" class="form-select">
+          <option :value="null">Church-wide</option>
+          <option v-for="b in branches" :key="b.id" :value="b.id">{{ b.name }}</option>
+        </select>
+      </FormField>
+
+      <template #footer>
+        <button type="button" class="btn btn-alt-secondary btn-sm" @click="showPhotoUpload = false">
+          Cancel
+        </button>
+        <button
+          type="button"
+          class="btn btn-primary btn-sm"
+          :disabled="uploadingPhoto"
+          @click="submitPhoto"
+        >
+          <span v-if="uploadingPhoto" class="spinner-border spinner-border-sm me-1"></span>
+          <i v-else class="fa fa-upload me-1"></i>
+          Upload
+        </button>
+      </template>
+    </AppModal>
+
+    <!-- New facility dialog -->
+    <AppModal
+      v-model:visible="showFacilityCreate"
+      title="New Facility"
+      subtitle="A space shown on the About page"
+      size="sm"
+    >
+      <FormField
+        label="Name"
+        required
+        :error="facilityErrors.name"
+        field-id="ac-fac-name"
+      >
+        <input
+          id="ac-fac-name"
+          v-model="facilityForm.name"
+          type="text"
+          class="form-control"
+          :class="{ 'is-invalid': facilityErrors.name }"
+          placeholder="e.g. Multi Purpose Hall"
+        />
+      </FormField>
+
+      <FormField
+        label="Description"
+        :error="facilityErrors.description"
+        field-id="ac-fac-desc"
+        hint="What the space is used for"
+      >
+        <textarea
+          id="ac-fac-desc"
+          v-model="facilityForm.description"
+          rows="3"
+          class="form-control"
+          :class="{ 'is-invalid': facilityErrors.description }"
+        ></textarea>
+      </FormField>
+
+      <FormField
+        label="Branch"
+        :error="facilityErrors.branch"
+        field-id="ac-fac-branch"
+        hint="Leave blank for church-wide"
+      >
+        <select id="ac-fac-branch" v-model="facilityForm.branch" class="form-select">
+          <option :value="null">Church-wide</option>
+          <option v-for="b in branches" :key="b.id" :value="b.id">{{ b.name }}</option>
+        </select>
+      </FormField>
+
+      <template #footer>
+        <button
+          type="button"
+          class="btn btn-alt-secondary btn-sm"
+          @click="showFacilityCreate = false"
+        >
+          Cancel
+        </button>
+        <button
+          type="button"
+          class="btn btn-primary btn-sm"
+          :disabled="creatingFacility"
+          @click="submitFacility"
+        >
+          <span v-if="creatingFacility" class="spinner-border spinner-border-sm me-1"></span>
+          Create facility
+        </button>
+      </template>
+    </AppModal>
+
+    <!-- New schedule row dialog -->
+    <AppModal
+      v-model:visible="showScheduleCreate"
+      title="New Schedule Row"
+      subtitle="A service shown in the public schedule"
+      size="sm"
+    >
+      <FormField
+        label="Service Name"
+        required
+        :error="scheduleErrors.name"
+        field-id="ac-sch-name"
+      >
+        <input
+          id="ac-sch-name"
+          v-model="scheduleForm.name"
+          type="text"
+          class="form-control"
+          :class="{ 'is-invalid': scheduleErrors.name }"
+          placeholder="e.g. 1st Service"
+        />
+      </FormField>
+
+      <div class="row g-3">
+        <div class="col-12 col-sm-6">
+          <FormField label="Day" required :error="scheduleErrors.day" field-id="ac-sch-day">
+            <input
+              id="ac-sch-day"
+              v-model="scheduleForm.day"
+              type="text"
+              class="form-control"
+              :class="{ 'is-invalid': scheduleErrors.day }"
+              placeholder="e.g. Sunday"
+            />
+          </FormField>
+        </div>
+        <div class="col-12 col-sm-6">
+          <FormField label="Time" required :error="scheduleErrors.time" field-id="ac-sch-time">
+            <input
+              id="ac-sch-time"
+              v-model="scheduleForm.time"
+              type="text"
+              class="form-control"
+              :class="{ 'is-invalid': scheduleErrors.time }"
+              placeholder="e.g. 8:00AM"
+            />
+          </FormField>
+        </div>
+      </div>
+
+      <FormField label="Order" required :error="scheduleErrors.order" field-id="ac-sch-order">
+        <input
+          id="ac-sch-order"
+          v-model.number="scheduleForm.order"
+          type="number"
+          min="0"
+          class="form-control"
+          :class="{ 'is-invalid': scheduleErrors.order }"
+        />
+      </FormField>
+
+      <FormField
+        label="Branch"
+        :error="scheduleErrors.branch"
+        field-id="ac-sch-branch"
+        hint="Leave blank for church-wide"
+      >
+        <select id="ac-sch-branch" v-model="scheduleForm.branch" class="form-select">
+          <option :value="null">Church-wide</option>
+          <option v-for="b in branches" :key="b.id" :value="b.id">{{ b.name }}</option>
+        </select>
+      </FormField>
+
+      <template #footer>
+        <button
+          type="button"
+          class="btn btn-alt-secondary btn-sm"
+          @click="showScheduleCreate = false"
+        >
+          Cancel
+        </button>
+        <button
+          type="button"
+          class="btn btn-primary btn-sm"
+          :disabled="creatingSchedule"
+          @click="submitSchedule"
+        >
+          <span v-if="creatingSchedule" class="spinner-border spinner-border-sm me-1"></span>
+          Add row
+        </button>
+      </template>
+    </AppModal>
+  </div>
 </template>
 
 <script setup>
 import { ref, onMounted } from "vue";
-import Tabs from "primevue/tabs";
-import TabList from "primevue/tablist";
-import Tab from "primevue/tab";
-import TabPanels from "primevue/tabpanels";
-import TabPanel from "primevue/tabpanel";
-import DataTable from "primevue/datatable";
-import Column from "primevue/column";
-import Button from "primevue/button";
-import Dialog from "primevue/dialog";
-import InputText from "primevue/inputtext";
-import InputNumber from "primevue/inputnumber";
-import Textarea from "primevue/textarea";
-import Select from "primevue/select";
-import FileUpload from "primevue/fileupload";
-import { useToast } from "primevue/usetoast";
+import { useToast } from "../composables/useToast";
 import aboutService from "../services/about.service";
 import churchProfileService from "../services/church-profile.service";
 import branchesService from "../services/branches.service";
@@ -188,27 +494,56 @@ import branchesService from "../services/branches.service";
 const toast = useToast();
 const branches = ref([]);
 
+const tab = ref("profile");
+
 const profile = ref({});
 const loadingProfile = ref(true);
 const savingProfile = ref(false);
+const profileErrors = ref({});
 
 const gallery = ref([]);
 const showPhotoUpload = ref(false);
 const uploadingPhoto = ref(false);
 const selectedPhoto = ref(null);
 const photoForm = ref({ caption: "", branch: null });
+const photoErrors = ref({});
 
 const facilities = ref([]);
 const loadingFacilities = ref(true);
 const showFacilityCreate = ref(false);
 const creatingFacility = ref(false);
 const facilityForm = ref({ name: "", description: "", branch: null });
+const facilityErrors = ref({});
 
 const schedule = ref([]);
 const loadingSchedule = ref(true);
 const showScheduleCreate = ref(false);
 const creatingSchedule = ref(false);
 const scheduleForm = ref({ name: "", day: "", time: "", order: 0, branch: null });
+const scheduleErrors = ref({});
+
+const facilityColumns = [
+  { field: "name", header: "Name", sortable: true, strong: true },
+  { field: "description", header: "Description" },
+];
+
+const scheduleColumns = [
+  { field: "name", header: "Service", sortable: true, strong: true },
+  { field: "day", header: "Day", sortable: true },
+  { field: "time", header: "Time", sortable: true },
+];
+
+/** Turn a Django error body ({ field: [msgs] }) into { field: message }. */
+function apiErrorMessages(e) {
+  const api = e.response?.data;
+  const mapped = {};
+  if (api && typeof api === "object") {
+    Object.entries(api).forEach(([k, v]) => {
+      mapped[k] = Array.isArray(v) ? v.join(" ") : String(v);
+    });
+  }
+  return mapped;
+}
 
 async function fetchProfile() {
   loadingProfile.value = true;
@@ -220,14 +555,34 @@ async function fetchProfile() {
   }
 }
 
+function validateProfile() {
+  const e = {};
+  if (!String(profile.value.name || "").trim()) e.name = "Church name is required.";
+  const email = String(profile.value.email || "").trim();
+  if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email))
+    e.email = "Enter a valid email address.";
+  profileErrors.value = e;
+  return Object.keys(e).length === 0;
+}
+
 async function saveProfile() {
+  if (!validateProfile()) return;
+
   savingProfile.value = true;
   try {
     const { data } = await churchProfileService.update(profile.value);
     profile.value = data;
+    profileErrors.value = {};
     toast.add({ severity: "success", summary: "Church profile saved", life: 2500 });
   } catch (e) {
-    toast.add({ severity: "error", summary: "Failed to save", detail: JSON.stringify(e.response?.data), life: 4000 });
+    const mapped = apiErrorMessages(e);
+    profileErrors.value = { ...profileErrors.value, ...mapped };
+    toast.add({
+      severity: "error",
+      summary: "Failed to save",
+      detail: Object.values(mapped)[0] || e.message,
+      life: 5000,
+    });
   } finally {
     savingProfile.value = false;
   }
@@ -242,15 +597,27 @@ async function fetchGallery() {
   }
 }
 
-function onPhotoSelect(event) {
-  selectedPhoto.value = event.files[0];
+function openPhotoUpload() {
+  photoForm.value = { caption: "", branch: null };
+  selectedPhoto.value = null;
+  photoErrors.value = {};
+  showPhotoUpload.value = true;
+}
+
+function onPhotoChange(event) {
+  selectedPhoto.value = event.target.files?.[0] || null;
+}
+
+function validatePhoto() {
+  const e = {};
+  if (!selectedPhoto.value) e.image = "Choose an image to upload.";
+  photoErrors.value = e;
+  return Object.keys(e).length === 0;
 }
 
 async function submitPhoto() {
-  if (!selectedPhoto.value) {
-    toast.add({ severity: "warn", summary: "Choose an image first", life: 2500 });
-    return;
-  }
+  if (!validatePhoto()) return;
+
   uploadingPhoto.value = true;
   try {
     const fd = new FormData();
@@ -262,9 +629,17 @@ async function submitPhoto() {
     showPhotoUpload.value = false;
     selectedPhoto.value = null;
     photoForm.value = { caption: "", branch: null };
+    photoErrors.value = {};
     toast.add({ severity: "success", summary: "Photo uploaded", life: 2500 });
   } catch (e) {
-    toast.add({ severity: "error", summary: "Upload failed", detail: JSON.stringify(e.response?.data), life: 4000 });
+    const mapped = apiErrorMessages(e);
+    photoErrors.value = { ...photoErrors.value, ...mapped };
+    toast.add({
+      severity: "error",
+      summary: "Upload failed",
+      detail: Object.values(mapped)[0] || e.message,
+      life: 5000,
+    });
   } finally {
     uploadingPhoto.value = false;
   }
@@ -280,16 +655,39 @@ async function fetchFacilities() {
   }
 }
 
+function openFacilityCreate() {
+  facilityForm.value = { name: "", description: "", branch: null };
+  facilityErrors.value = {};
+  showFacilityCreate.value = true;
+}
+
+function validateFacility() {
+  const e = {};
+  if (!String(facilityForm.value.name || "").trim()) e.name = "Facility name is required.";
+  facilityErrors.value = e;
+  return Object.keys(e).length === 0;
+}
+
 async function submitFacility() {
+  if (!validateFacility()) return;
+
   creatingFacility.value = true;
   try {
     const { data } = await aboutService.createFacility(facilityForm.value);
     facilities.value.unshift(data);
     showFacilityCreate.value = false;
     facilityForm.value = { name: "", description: "", branch: null };
+    facilityErrors.value = {};
     toast.add({ severity: "success", summary: "Facility created", life: 2500 });
   } catch (e) {
-    toast.add({ severity: "error", summary: "Failed to create", detail: JSON.stringify(e.response?.data), life: 4000 });
+    const mapped = apiErrorMessages(e);
+    facilityErrors.value = { ...facilityErrors.value, ...mapped };
+    toast.add({
+      severity: "error",
+      summary: "Failed to create",
+      detail: Object.values(mapped)[0] || e.message,
+      life: 5000,
+    });
   } finally {
     creatingFacility.value = false;
   }
@@ -305,16 +703,45 @@ async function fetchSchedule() {
   }
 }
 
+function openScheduleCreate() {
+  scheduleForm.value = { name: "", day: "", time: "", order: 0, branch: null };
+  scheduleErrors.value = {};
+  showScheduleCreate.value = true;
+}
+
+function validateSchedule() {
+  const e = {};
+  const f = scheduleForm.value;
+  if (!String(f.name || "").trim()) e.name = "Service name is required.";
+  if (!String(f.day || "").trim()) e.day = "Day is required.";
+  if (!String(f.time || "").trim()) e.time = "Time is required.";
+  if (f.order === "" || f.order === null || f.order === undefined || Number.isNaN(Number(f.order)))
+    e.order = "Order is required.";
+  else if (Number(f.order) < 0) e.order = "Order cannot be negative.";
+  scheduleErrors.value = e;
+  return Object.keys(e).length === 0;
+}
+
 async function submitSchedule() {
+  if (!validateSchedule()) return;
+
   creatingSchedule.value = true;
   try {
     const { data } = await aboutService.createScheduleRow(scheduleForm.value);
     schedule.value.push(data);
     showScheduleCreate.value = false;
     scheduleForm.value = { name: "", day: "", time: "", order: 0, branch: null };
+    scheduleErrors.value = {};
     toast.add({ severity: "success", summary: "Schedule row added", life: 2500 });
   } catch (e) {
-    toast.add({ severity: "error", summary: "Failed to add", detail: JSON.stringify(e.response?.data), life: 4000 });
+    const mapped = apiErrorMessages(e);
+    scheduleErrors.value = { ...scheduleErrors.value, ...mapped };
+    toast.add({
+      severity: "error",
+      summary: "Failed to add",
+      detail: Object.values(mapped)[0] || e.message,
+      life: 5000,
+    });
   } finally {
     creatingSchedule.value = false;
   }
@@ -339,15 +766,21 @@ onMounted(() => {
 </script>
 
 <style scoped>
-.panel-body { max-width: 600px; padding: 1rem 0; }
-.header-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem; }
-.form-field { margin-bottom: 1rem; }
-.form-field label { display: block; margin-bottom: 0.35rem; font-size: 0.85rem; color: #475569; }
-.form-row { display: flex; gap: 1rem; }
-.form-row .form-field { flex: 1; }
-.w-full { width: 100%; }
-.file-name { display: block; margin-top: 0.5rem; font-size: 0.85rem; color: #475569; }
-.gallery-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 1rem; }
-.gallery-item img { width: 100%; height: 140px; object-fit: cover; border-radius: 6px; }
-.gallery-caption { font-size: 0.8rem; color: #64748b; margin-top: 0.35rem; }
+/* Gallery is view-specific layout; shared form/header rules come from globals */
+.gallery-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 1rem;
+}
+.gallery-item img {
+  width: 100%;
+  height: 140px;
+  object-fit: cover;
+  border-radius: 6px;
+}
+.gallery-caption {
+  font-size: 0.8rem;
+  color: var(--bs-secondary-color);
+  margin-top: 0.35rem;
+}
 </style>

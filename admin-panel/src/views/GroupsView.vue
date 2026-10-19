@@ -1,92 +1,238 @@
 <template>
   <div>
-    <div class="header-row">
-      <h2 class="section-title">Growth-Track Groups</h2>
-      <Button label="New Group" icon="pi pi-plus" @click="showCreate = true" />
+    <!-- Header -->
+    <div class="header-row mb-3">
+      <div>
+        <h2 class="section-title mb-0">Growth-Track Groups</h2>
+        <p class="text-muted fs-sm mb-0">
+          {{ store.items.length }} {{ store.items.length === 1 ? "group" : "groups" }}
+        </p>
+      </div>
+      <button type="button" class="btn btn-primary btn-sm" @click="openCreate">
+        <i class="fa fa-plus me-1"></i> New Group
+      </button>
     </div>
-    <DataTable :value="store.items" :loading="store.loading" paginator :rows="15">
-      <Column field="name" header="Name" sortable />
-      <Column field="branch" header="Branch" />
-      <Column header="Age Range">
-        <template #body="{ data }">{{ data.min_age }} - {{ data.max_age }}</template>
-      </Column>
-      <Column header="Active">
-        <template #body="{ data }">
-          <Tag :value="data.is_active ? 'Yes' : 'No'" :severity="data.is_active ? 'success' : 'secondary'" />
-        </template>
-      </Column>
-    </DataTable>
 
-    <Dialog v-model:visible="showCreate" header="New Growth-Track Group" modal style="width:460px">
-      <div class="form-field">
-        <label>Name</label>
-        <InputText v-model="form.name" class="w-full" placeholder="e.g. Youth - Wesley Mombasa" />
-      </div>
-      <div class="form-field">
-        <label>Branch</label>
-        <Select v-model="form.branch" :options="branches" optionLabel="name" optionValue="id" class="w-full" placeholder="Select branch" />
-      </div>
-      <div class="form-field">
-        <label>Description</label>
-        <Textarea v-model="form.description" class="w-full" rows="2" />
-      </div>
-      <div class="form-row">
-        <div class="form-field">
-          <label>Min Age</label>
-          <InputNumber v-model="form.min_age" class="w-full" />
-        </div>
-        <div class="form-field">
-          <label>Max Age</label>
-          <InputNumber v-model="form.max_age" class="w-full" />
-        </div>
-      </div>
-      <div class="form-field">
-        <label>Marital Status Requirement</label>
-        <Select v-model="form.marital_status_requirement" :options="maritalOptions" optionLabel="label" optionValue="value" class="w-full" />
-      </div>
-      <div class="form-field checkbox-row">
-        <Checkbox v-model="form.enforce_eligibility" binary inputId="enforce" />
-        <label for="enforce">Enforce age/marital eligibility on join</label>
-      </div>
-      <template #footer>
-        <Button label="Cancel" text @click="showCreate = false" />
-        <Button label="Create" :loading="creating" @click="submitCreate" />
+    <AppDataTable
+      :rows="store.items"
+      :columns="columns"
+      :loading="store.loading"
+      :page-size="15"
+      search-placeholder="Search name, branch or age range…"
+      export-name="groups"
+      empty-text="No groups yet. Create the first one."
+      empty-icon="fa-project-diagram"
+    >
+      <template #branch="{ row }">
+        <span v-if="row.branch_name" class="badge rounded-pill bg-light text-dark border">
+          {{ row.branch_name }}
+        </span>
+        <span v-else class="text-muted">—</span>
       </template>
-    </Dialog>
+
+      <template #age="{ row }">{{ row.min_age }} - {{ row.max_age }}</template>
+
+      <template #active="{ row }">
+        <span
+          class="badge rounded-pill"
+          :class="
+            row.is_active
+              ? 'bg-success-subtle text-success-emphasis'
+              : 'bg-secondary-subtle text-secondary-emphasis'
+          "
+        >
+          {{ row.is_active ? "Yes" : "No" }}
+        </span>
+      </template>
+    </AppDataTable>
+
+    <!-- Create dialog -->
+    <AppModal
+      v-model:visible="showCreate"
+      title="New Growth-Track Group"
+      subtitle="Set up a discipleship group and its eligibility rules"
+      size="sm"
+    >
+      <FormField label="Name" required :error="errors.name" field-id="g-name">
+        <input
+          id="g-name"
+          v-model="form.name"
+          type="text"
+          class="form-control"
+          :class="{ 'is-invalid': errors.name }"
+          placeholder="e.g. Youth - Wesley Mombasa"
+        />
+      </FormField>
+
+      <FormField label="Branch" required :error="errors.branch" field-id="g-branch">
+        <select
+          id="g-branch"
+          v-model="form.branch"
+          class="form-select"
+          :class="{ 'is-invalid': errors.branch }"
+        >
+          <option :value="null">Select branch</option>
+          <option v-for="b in branches" :key="b.id" :value="b.id">
+            {{ b.name }}
+          </option>
+        </select>
+      </FormField>
+
+      <FormField label="Description" :error="errors.description" field-id="g-desc">
+        <textarea
+          id="g-desc"
+          v-model="form.description"
+          rows="2"
+          class="form-control"
+          :class="{ 'is-invalid': errors.description }"
+          placeholder="What is this group about?"
+        ></textarea>
+      </FormField>
+
+      <div class="row g-3">
+        <div class="col-12 col-sm-6">
+          <FormField label="Min age" required :error="errors.min_age" field-id="g-min-age">
+            <input
+              id="g-min-age"
+              v-model.number="form.min_age"
+              type="number"
+              min="0"
+              class="form-control"
+              :class="{ 'is-invalid': errors.min_age }"
+            />
+          </FormField>
+        </div>
+        <div class="col-12 col-sm-6">
+          <FormField label="Max age" required :error="errors.max_age" field-id="g-max-age">
+            <input
+              id="g-max-age"
+              v-model.number="form.max_age"
+              type="number"
+              min="0"
+              class="form-control"
+              :class="{ 'is-invalid': errors.max_age }"
+            />
+          </FormField>
+        </div>
+      </div>
+
+      <FormField
+        label="Marital status requirement"
+        :error="errors.marital_status_requirement"
+        field-id="g-marital"
+      >
+        <select id="g-marital" v-model="form.marital_status_requirement" class="form-select">
+          <option v-for="m in maritalOptions" :key="m.value" :value="m.value">
+            {{ m.label }}
+          </option>
+        </select>
+      </FormField>
+
+      <div class="form-check mb-3">
+        <input
+          id="g-enforce"
+          v-model="form.enforce_eligibility"
+          type="checkbox"
+          class="form-check-input"
+        />
+        <label class="form-check-label" for="g-enforce">
+          Enforce age/marital eligibility on join
+        </label>
+      </div>
+
+      <template #footer>
+        <button type="button" class="btn btn-alt-secondary btn-sm" @click="showCreate = false">
+          Cancel
+        </button>
+        <button
+          type="button"
+          class="btn btn-primary btn-sm"
+          :disabled="creating"
+          @click="submitCreate"
+        >
+          <span v-if="creating" class="spinner-border spinner-border-sm me-1"></span>
+          Create group
+        </button>
+      </template>
+    </AppModal>
   </div>
 </template>
 
 <script setup>
 import { ref, onMounted } from "vue";
-import DataTable from "primevue/datatable";
-import Column from "primevue/column";
-import Tag from "primevue/tag";
-import Button from "primevue/button";
-import Dialog from "primevue/dialog";
-import InputText from "primevue/inputtext";
-import InputNumber from "primevue/inputnumber";
-import Textarea from "primevue/textarea";
-import Select from "primevue/select";
-import Checkbox from "primevue/checkbox";
-import { useToast } from "primevue/usetoast";
+import { useToast } from "../composables/useToast";
 import { useGroupsStore } from "../store/groups";
 import groupsService from "../services/groups.service";
 import branchesService from "../services/branches.service";
 
-const store = useGroupsStore();
 const toast = useToast();
+
+const store = useGroupsStore();
 const branches = ref([]);
 const showCreate = ref(false);
 const creating = ref(false);
+
 const maritalOptions = [
   { label: "Any", value: "any" },
   { label: "Single only", value: "single" },
   { label: "Married only", value: "married" },
 ];
-const form = ref({
-  name: "", branch: null, description: "", min_age: 0, max_age: 120,
-  marital_status_requirement: "any", enforce_eligibility: false,
+
+const columns = [
+  { field: "name", header: "Name", sortable: true, strong: true },
+  { field: "branch_name", header: "Branch", slot: "branch" },
+  { field: "min_age", header: "Age Range", slot: "age" },
+  { field: "is_active", header: "Active", slot: "active" },
+];
+
+const blank = () => ({
+  name: "",
+  branch: null,
+  description: "",
+  min_age: 0,
+  max_age: 120,
+  marital_status_requirement: "any",
+  enforce_eligibility: false,
 });
+
+const form = ref(blank());
+const errors = ref({});
+
+function openCreate() {
+  form.value = blank();
+  errors.value = {};
+  showCreate.value = true;
+}
+
+function validate() {
+  const e = {};
+  if (!form.value.name.trim()) e.name = "Group name is required.";
+  if (!form.value.branch) e.branch = "Branch is required.";
+
+  const min = Number(form.value.min_age);
+  const max = Number(form.value.max_age);
+  if (form.value.min_age === "" || Number.isNaN(min) || min < 0)
+    e.min_age = "Enter a minimum age of 0 or more.";
+  else if (form.value.max_age === "" || Number.isNaN(max))
+    e.max_age = "Enter a maximum age.";
+  else if (max < min)
+    e.max_age = "Maximum age must be greater than or equal to minimum age.";
+
+  errors.value = e;
+  return Object.keys(e).length === 0;
+}
+
+/** Turn a Django error body ({ field: [msgs] }) into { field: message }. */
+function apiErrorMessages(e) {
+  const api = e.response?.data;
+  const mapped = {};
+  if (api && typeof api === "object") {
+    Object.entries(api).forEach(([k, v]) => {
+      mapped[k] = Array.isArray(v) ? v.join(" ") : String(v);
+    });
+  }
+  return mapped;
+}
 
 async function fetchBranches() {
   try {
@@ -98,37 +244,39 @@ async function fetchBranches() {
 }
 
 async function submitCreate() {
+  if (!validate()) return;
+
   creating.value = true;
   try {
     const { data } = await groupsService.create(form.value);
     store.items.unshift(data);
     showCreate.value = false;
-    form.value = {
-      name: "", branch: null, description: "", min_age: 0, max_age: 120,
-      marital_status_requirement: "any", enforce_eligibility: false,
-    };
+    form.value = blank();
     toast.add({ severity: "success", summary: "Group created", life: 2500 });
   } catch (e) {
-    toast.add({ severity: "error", summary: "Failed to create", detail: JSON.stringify(e.response?.data), life: 4000 });
+    // Surface Django field errors next to their inputs when we can
+    const mapped = apiErrorMessages(e);
+    errors.value = { ...errors.value, ...mapped };
+    toast.add({
+      severity: "error",
+      summary: "Could not create group",
+      detail: Object.values(mapped)[0] || e.message,
+      life: 5000,
+    });
   } finally {
     creating.value = false;
   }
 }
 
 onMounted(() => {
-  store.fetchAll();
+  store.fetchAll().catch(() => {
+    toast.add({
+      severity: "error",
+      summary: "Could not load groups",
+      detail: "Check that the API is running.",
+      life: 5000,
+    });
+  });
   fetchBranches();
 });
 </script>
-
-<style scoped>
-.section-title { font-size: 1.1rem; font-weight: 600; margin: 0; color: #1e293b; }
-.header-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem; }
-.form-field { margin-bottom: 1rem; }
-.form-field label { display: block; margin-bottom: 0.35rem; font-size: 0.85rem; color: #475569; }
-.form-row { display: flex; gap: 1rem; }
-.form-row .form-field { flex: 1; }
-.checkbox-row { display: flex; align-items: center; gap: 0.5rem; }
-.checkbox-row label { margin: 0; }
-.w-full { width: 100%; }
-</style>
