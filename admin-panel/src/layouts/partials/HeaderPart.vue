@@ -12,6 +12,16 @@ const auth = useAuthStore();
 // Current page title from the route meta
 const pageTitle = computed(() => route.meta.title || "Dashboard");
 
+// Available color themes (must match the theme-* classes in styles.scss)
+const colorThemes = [
+  { id: "wesley", label: "Wesley", swatch: "#0b6bd8" },
+  { id: "modern", label: "Modern", swatch: "#0c91cf" },
+  { id: "city", label: "City", swatch: "#db3954" },
+  { id: "flat", label: "Flat", swatch: "#069fba" },
+  { id: "amethyst", label: "Amethyst", swatch: "#6366f1" },
+  { id: "smooth", label: "Smooth", swatch: "#d4428b" },
+];
+
 // Initials for the avatar chip
 const initials = computed(() => {
   const name = auth.user?.full_name || auth.user?.email || "";
@@ -68,6 +78,48 @@ function handleLogout() {
           <!-- Right Section -->
           <div class="d-flex align-items-center">
             <slot name="content-right">
+              <!-- Color Theme -->
+              <div class="dropdown d-inline-block me-1">
+                <button
+                  type="button"
+                  class="btn btn-sm btn-alt-secondary"
+                  id="header-color-theme-dropdown"
+                  data-bs-toggle="dropdown"
+                  aria-haspopup="true"
+                  aria-expanded="false"
+                  aria-label="Change color theme"
+                >
+                  <i class="fa fa-fw fa-palette"></i>
+                </button>
+                <div
+                  class="dropdown-menu dropdown-menu-end smini-hide border-0"
+                  aria-labelledby="header-color-theme-dropdown"
+                >
+                  <div class="px-3 py-1 fs-sm fw-semibold text-uppercase opacity-50">
+                    Color theme
+                  </div>
+                  <button
+                    v-for="theme in colorThemes"
+                    :key="theme.id"
+                    type="button"
+                    class="dropdown-item d-flex align-items-center gap-2"
+                    :class="{ active: store.settings.colorTheme === theme.id }"
+                    @click="store.setColorTheme({ theme: theme.id })"
+                  >
+                    <span
+                      class="theme-swatch rounded-circle"
+                      :style="{ background: theme.swatch }"
+                    ></span>
+                    <span class="fs-sm fw-medium">{{ theme.label }}</span>
+                    <i
+                      v-if="store.settings.colorTheme === theme.id"
+                      class="fa fa-check ms-auto fs-xs opacity-50"
+                    ></i>
+                  </button>
+                </div>
+              </div>
+              <!-- END Color Theme -->
+
               <!-- Dark Mode -->
               <div class="dropdown d-inline-block mx-1">
                 <button

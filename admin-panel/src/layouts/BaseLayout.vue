@@ -45,12 +45,6 @@ const classContainer = computed(() => {
     "sidebar-o": store.layout.sidebar && store.settings.sidebarVisibleDesktop,
     "sidebar-o-xs": store.layout.sidebar && store.settings.sidebarVisibleMobile,
     "sidebar-dark": store.layout.sidebar && store.settings.sidebarDark,
-    "side-overlay-o":
-      store.layout.sideOverlay && store.settings.sideOverlayVisible,
-    "side-overlay-hover":
-      store.layout.sideOverlay && store.settings.sideOverlayHoverable,
-    "enable-page-overlay":
-      store.layout.sideOverlay && store.settings.pageOverlay,
     "page-header-fixed": store.layout.header && store.settings.headerFixed,
     "page-header-dark": store.layout.header && store.settings.headerDark,
     "main-content-boxed": store.settings.mainContent === "boxed",
@@ -91,8 +85,6 @@ onMounted(() => {
   <div id="page-container" :class="classContainer">
     <!-- Page Loader -->
     <div id="page-loader" :class="{ show: store.settings.pageLoader }"></div>
-
-    <!-- END Side Overlay -->
 
     <!-- Sidebar -->
     <BaseSidebar

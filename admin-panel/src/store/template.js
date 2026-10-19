@@ -15,7 +15,6 @@ export const useTemplateStore = defineStore({
     layout: {
       header: true,
       sidebar: true,
-      sideOverlay: true,
       footer: true,
     },
 
@@ -30,13 +29,8 @@ export const useTemplateStore = defineStore({
       sidebarDark: true,
       sidebarVisibleDesktop: true,
       sidebarVisibleMobile: false,
-      sideOverlayVisible: false,
-      sideOverlayHoverable: false,
-      pageOverlay: true,
       headerFixed: true,
       headerDark: false,
-      headerSearch: false,
-      headerLoader: false,
       pageLoader: false,
       rtlSupport: false,
       sideTransitions: true,
@@ -48,7 +42,6 @@ export const useTemplateStore = defineStore({
     setLayout(payload) {
       this.layout.header = payload.header;
       this.layout.sidebar = payload.sidebar;
-      this.layout.sideOverlay = payload.sideOverlay;
       this.layout.footer = payload.footer;
     },
     // Sets sidebar visibility (open, close, toggle)
@@ -105,37 +98,6 @@ export const useTemplateStore = defineStore({
         this.settings.sidebarDark = !this.settings.sidebarDark;
       }
     },
-    // Sets side overlay visibility (open, close, toggle)
-    sideOverlay(payload) {
-      if (payload.mode === "open") {
-        this.settings.sideOverlayVisible = true;
-      } else if (payload.mode === "close") {
-        this.settings.sideOverlayVisible = false;
-      } else if (payload.mode === "toggle") {
-        this.settings.sideOverlayVisible = !this.settings.sideOverlayVisible;
-      }
-    },
-    // Sets side overlay hover mode (on, off, toggle)
-    sideOverlayHover(payload) {
-      if (payload.mode === "on") {
-        this.settings.sideOverlayHoverable = true;
-      } else if (payload.mode === "off") {
-        this.settings.sideOverlayHoverable = false;
-      } else if (payload.mode === "toggle") {
-        this.settings.sideOverlayHoverable =
-          !this.settings.sideOverlayHoverable;
-      }
-    },
-    // Sets page overlay visibility (on, off, toggle)
-    pageOverlay(payload) {
-      if (payload.mode === "on") {
-        this.settings.pageOverlay = true;
-      } else if (payload.mode === "off") {
-        this.settings.pageOverlay = false;
-      } else if (payload.mode === "toggle") {
-        this.settings.pageOverlay = !this.settings.pageOverlay;
-      }
-    },
     // Sets header mode (fixed, static, toggle)
     header(payload) {
       if (payload.mode === "fixed") {
@@ -154,26 +116,6 @@ export const useTemplateStore = defineStore({
         this.settings.headerDark = false;
       } else if (payload.mode === "toggle") {
         this.settings.headerDark = !this.settings.headerDark;
-      }
-    },
-    // Sets header search visibility (on, off, toggle)
-    headerSearch(payload) {
-      if (payload.mode === "on") {
-        this.settings.headerSearch = true;
-      } else if (payload.mode === "off") {
-        this.settings.headerSearch = false;
-      } else if (payload.mode === "toggle") {
-        this.settings.headerSearch = !this.settings.headerSearch;
-      }
-    },
-    // Sets header loader visibility (on, off, toggle)
-    headerLoader(payload) {
-      if (payload.mode === "on") {
-        this.settings.headerLoader = true;
-      } else if (payload.mode === "off") {
-        this.settings.headerLoader = false;
-      } else if (payload.mode === "toggle") {
-        this.settings.headerLoader = !this.settings.headerLoader;
       }
     },
     // Sets page loader visibility (on, off, toggle)
